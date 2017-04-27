@@ -1,0 +1,104 @@
+body {
+    font-family: 'Microsoft Yahei', '微软雅黑';
+}
+.hiwall-header{
+    height: 45px;
+    background-color: #3598DC;
+    color: white;
+    text-align: center;
+    width: 100%;
+    top:0px;
+    z-index: 200;
+    padding-top: 20px;
+	-webkit-box-sizing:content-box;
+}
+.hiwall-header+div,.hiwall-header+section,.hiwall-header+ul,.hiwall-header+header{
+	/*margin-top:45px;*/
+}
+header{
+    height: 45px;
+    background-color: #3598DC;
+    color: white;
+    font-size: 16px;
+    line-height: 16px;
+    display: -webkit-box;
+}
+header .hiwall-header-left{
+    line-height: 45px;
+    width: 45px;
+    height: 45px;
+    text-align:center;
+    font-size: 30px;
+}
+.hiwall-header-left img{
+    width: 11px;
+    height: 16px;
+    position: relative;
+    bottom: 3px;
+}
+.hiwall-header-left div{
+    width: 11px;
+    height: 16px;
+    margin-top: -3px;
+}
+header .hiwall-header-right{
+    width: 45px;
+    height: 45px;
+}
+header .hiwall-header-title{
+    font-size: 18px;
+    line-height: 45px;
+    -webkit-box-flex:1
+}
+.hiwall-input{
+	border: solid 1px #03528D;
+    height: 40px;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 20px;
+}
+.hiwall-button-blue{
+    height: 40px;
+    background-color: #3598DC;
+    width: 100%;
+    font-size: 16px;
+    border-radius: 3px;
+    color: white;
+}
+ .hiwall-button-deepblue{
+     height:40px;
+     background-color: #03528D;
+     width: 100%;
+     font-size: 16px;
+     border-radius: 3px;
+     color: white;
+ }
+ .hiwall-button-border-blue{
+     height:40px;
+     width: 100%;
+     font-size: 16px;
+     border-radius: 3px;
+     border: solid 1px #03528D;
+     color: #03528D;
+ }
+ .hiwall-label-white{
+     height: 40px;
+     line-height: 40px;
+     font-size: 15px;
+     color: #000000;
+     background-color: white;
+     padding-left: 10px;
+ }
+ .hiwall-label-right{
+     float: right;
+     margin-right: 10px
+ }
+  header .hiwall-header-right img{
+     width: 25px;
+     margin-top: 12px
+ }
+.user-icon{
+	width:100px;
+	height:100px;
+	border-radius:50%;
+}

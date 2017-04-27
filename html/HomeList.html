@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<style>
+		.homelist-tab {
+			border-radius: 5px;
+			display: inline-block;
+			line-height: 27px;
+			list-style: none;
+			width: 65px;
+			position: relative;
+			top: -10px;
+			font-size: 17px
+		}
+		.homelist-tab-active {
+			border: none;
+			display: inline-block;
+			border-radius: 5px;
+			line-height: 27px;
+			list-style: none;
+			color: #3598DC;
+			background-color: #ffffff;
+			width: 65px;
+			position: relative;
+			top: -10px;
+			font-size: 17px
+		}
+	</style>
+	<body class="hiwall-bg-gray"></body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script>
+		var pageArr = ['ChatList.html', 'FriendsList.html', 'TopicList.html'];
+		var current = 'FriendsList.html';
+		var initState = {
+			'ChatList.html' : 0,
+			'FriendsList.html' : 0,
+			'TopicList.html' : 0
+		};
+		var headHeight = 65;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}
+			current = 'FriendsList.html';
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			if (api.systemType == 'android' && api.systemVersion < 4.4) {
+				headHeight = 45;
+			}
+			api.addEventListener({
+				name : 'reLogin'
+			}, refreshPage);
+		}
+		function refreshPage() {
+			initState[pageArr[0]] = 0;
+		}
+
+		function showFrame() {
+			//			api.closeFrame({
+			//				name : pageArr[0]
+			//			});
+			//			api.closeFrame({
+			//				name : pageArr[1]
+			//			});
+			//			api.closeFrame({
+			//				name : pageArr[2]
+			//			});
+			//			var initState = {
+			//			'ChatList.html' : 0,
+			//			'FriendsList.html' : 0,
+			//			'TopicList.html' : 0
+			//			};
+			if (current == pageArr[0]) {
+				showChatFrame()
+			} else if (current == pageArr[1]) {
+				showFriendsFrame()
+			} else if (current == pageArr[2]) {
+				showTopicFrame()
+			}
+		}
+
+		function refreshCurrentFrame() {
+			api.execScript({
+				frameName : current,
+				script : 'refreshPage();'
+			});
+		}
+
+		function showChatFrame() {
+			console.log(pageArr[0]);
+			console.log(initState[pageArr[0]]);
+			current = pageArr[0];
+			if (initState[pageArr[0]] == 0) {
+				api.openFrame({
+					reload : true,
+					name : pageArr[0],
+					url : pageArr[0],
+					scrollEnabled : false,
+					rect : {
+						y : headHeight,
+						h : api.frameHeight
+					},
+					bounces : false,
+				});
+				initState[pageArr[0]] = 1;
+			} else {
+				api.sendFrameToBack({
+					from : pageArr[1],
+					to : current,
+				});
+				api.sendFrameToBack({
+					from : pageArr[2],
+					to : current,
+				});
+				api.bringFrameToFront({
+					from : current,
+				});
+				api.execScript({
+					frameName : current,
+					script : 'reloadPage();'
+				});
+			}
+			api.setFrameAttr({
+				name : current,
+				hidden : false
+			});
+		}
+
+		function showTopicFrame() {
+			current = pageArr[2];
+			if (initState[pageArr[2]] == 0) {
+				api.openFrame({
+					name : pageArr[2],
+					url : pageArr[2],
+					scrollEnabled : false,
+					rect : {
+						y : headHeight,
+						h : api.frameHeight
+					},
+					bounces : false,
+				});
+				initState[pageArr[2]] = 1;
+			} else {
+				api.sendFrameToBack({
+					from : 'ChatList.html',
+					to : 'TopicList.html',
+				});
+				api.sendFrameToBack({
+					from : 'FriendsList.html',
+					to : 'TopicList.html',
+				});
+				api.bringFrameToFront({
+					from : 'TopicList.html',
+				});
+				api.execScript({
+					frameName : current,
+					script : 'reloadPage();'
+				});
+			}
+			api.setFrameAttr({
+				name : current,
+				hidden : false
+			});
+		}
+
+		function showFriendsFrame() {
+			console.log('FriendsList.html');
+			current = pageArr[1];
+			if (initState[pageArr[1]] == 0) {
+				api.openFrame({
+					name : pageArr[1],
+					url : pageArr[1],
+					scrollEnabled : false,
+					rect : {
+						y : headHeight,
+						h : api.frameHeight
+					},
+					bounces : false,
+				});
+				initState[pageArr[1]] = 1;
+			} else {
+				api.sendFrameToBack({
+					from : 'ChatList.html',
+					to : 'FriendsList.html',
+				});
+				api.sendFrameToBack({
+					from : 'TopicList.html',
+					to : 'FriendsList.html',
+				});
+				api.bringFrameToFront({
+					from : 'FriendsList.html',
+				});
+				api.execScript({
+					frameName : current,
+					script : 'reloadPage();'
+				});
+			}
+			api.setFrameAttr({
+				name : current,
+				hidden : false
+			});
+		}
+
+		function openChatFrame() {
+			current = 'ChatList.html';
+			console.log(current);
+			api.closeFrame({
+				name : pageArr[0]
+			});
+			api.closeFrame({
+				name : pageArr[1]
+			});
+			api.closeFrame({
+				name : pageArr[2]
+			});
+			api.openFrame({
+				name : pageArr[0],
+				url : pageArr[0],
+				scrollEnabled : false,
+				rect : {
+					y : headHeight,
+					h : api.frameHeight
+				},
+				bounces : false,
+			});
+		}
+
+		function openTopicFrame() {
+			current = 'TopicList.html';
+			console.log(current);
+			api.closeFrame({
+				name : pageArr[0]
+			});
+			api.closeFrame({
+				name : pageArr[1]
+			});
+			api.closeFrame({
+				name : pageArr[2]
+			});
+			api.openFrame({
+				name : pageArr[2],
+				url : pageArr[2],
+				scrollEnabled : false,
+				rect : {
+					y : headHeight,
+					h : api.frameHeight
+				},
+				bounces : false,
+			});
+		}
+
+		function openFriendsFrame() {
+			api.closeFrame({
+				name : pageArr[0]
+			});
+			api.closeFrame({
+				name : pageArr[1]
+			});
+			api.closeFrame({
+				name : pageArr[2]
+			});
+			current = 'FriendsList.html';
+			console.log(current)
+			api.openFrame({
+				name : pageArr[1],
+				url : pageArr[1],
+				scrollEnabled : false,
+				rect : {
+					y : headHeight,
+					h : api.frameHeight
+				},
+				bounces : false,
+			});
+		}
+
+		function openSearch() {
+			var obj = api.require('UISearchBar');
+			obj.open({
+				placeholder : '用户搜索',
+				historyCount : 10,
+				showRecordBtn : false,
+				texts : {
+					cancelText : '取消',
+					clearText : '清除搜索记录'
+				},
+				styles : {
+					navBar : {
+						bgColor : '#c9c9c9',
+						borderColor : '#ccc'
+					},
+					searchBox : {
+						bgImg : 'widget://image/bg-white.png',
+						color : '#000',
+						height : 34
+					},
+					cancel : {
+						bg : 'rgba(0,0,0,0)',
+						color : '#3598DC',
+						size : 16
+					},
+					list : {
+						color : '#696969',
+						bgColor : '#FFFFFF',
+						borderColor : '#eee',
+						size : 16
+					},
+					clear : {
+						color : '#000000',
+						borderColor : '#ccc',
+						size : 16
+					}
+				}
+			}, function(ret) {
+				console.log('点击了搜索按钮');
+				var func = 'searchFriends("' + ret.text + '")';
+				api.execScript({
+					frameName : 'UserSearchSub.html',
+					script : func
+				});
+				if (ret.eventType == 'search') {
+				} else if (ret.eventType == 'history') {
+				} else {
+				}
+			});
+		}
+	</script>
+</html>

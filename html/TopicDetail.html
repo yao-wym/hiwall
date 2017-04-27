@@ -1,0 +1,38 @@
+	<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>故事</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dynamic.css" />
+    <link rel="stylesheet" type="text/css" href="../css/common.css" />
+    <link rel="stylesheet" type="text/css" href="../css/wight.css" />
+</head>
+<body>
+		<header id="hiwall-header" class="header hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div id="topic-title" class="hiwall-header-title">
+				
+			</div>
+			<div class="hiwall-header-right">
+				<!--<img src="../image/friend_add.png">-->
+			</div>
+		</header>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript">
+    apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+    	openSubFrame('TopicDetailSub.html');
+        api.parseTapmode();
+        $api.byId("topic-title").innerText = api.pageParam.topicName;
+    }
+</script>
+</html>

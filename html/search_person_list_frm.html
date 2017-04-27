@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>附近的人</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/search.css" />
+</head>
+<body>
+	<div class="aui-content search-circle">
+        <div class="aui-iconfont aui-icon-search"></div>
+        <div class="search-circle-input"><input type="text" id="keyword" placeholder="输入用户昵称" required></div>
+        <div class="search-circlebtn aui-pull-right" tapmode onclick="searchdo();">搜索</div>
+    </div>
+    <div class="aui-content search-type">
+    	<div class="aui-col-xs-4 aui-text-center search-type-list" tapmode onclick="search('all')">
+			<span class="aui-iconfont aui-icon-more bg-more"></span>
+            <p>全部</p>
+		</div>
+		<div class="aui-col-xs-4 aui-text-center search-type-list" tapmode onclick="search('boy')">
+			<span class="aui-iconfont aui-icon-man bg-2"></span>
+            <p>看男</p>
+		</div>
+		<div class="aui-col-xs-4 aui-text-center search-type-list" tapmode onclick="search('girl')">
+			<span class="aui-iconfont aui-icon-women bg-6"></span>
+            <p>找女</p>
+		</div>
+	</div>
+	<script id="circle-template" type="text/x-dot-template">
+    {{? it.length>0}}
+    {{ for(var i in it) { }}
+    {{? it[i].userid!=0}}
+    <div class="aui-list-view search-list" tapmode onclick="spaceShow({{=it[i].userid}});">
+		<div class="aui-col-xs-12">
+			<div class="search-avatar">
+				<img src="../image/noavatar.gif" {{? it[i].avatar}}data-echo="{{=it[i].avatar}}"{{? }}>
+			</div>
+			<div class="search-info">
+				<div class="search-title">
+					{{=it[i].nickname}}
+					{{? it[i].sex==1 }}
+                    <small class="boy"><span class="aui-iconfont aui-icon-man"></span> {{=it[i].age}} 岁</small>
+                    {{?? it[i].sex==2 }}
+                    <small class="girl"><span class="aui-iconfont aui-icon-women"></span> {{=it[i].age}} 岁</small>
+                    {{? }}
+                    {{? it[i].mate==2 }}
+                    <small class="feidanshen">非单身</small>
+                    {{?? }}
+                    <small class="danshen">单身</small>
+                    {{? }}
+					{{? it[i].distance <= '0.1'}}
+					<span class="aui-pull-right"><100 m</span>
+					{{??}}
+					<span class="aui-pull-right">{{=it[i].distance}} km</span>
+					{{? }}
+				</div>
+				{{? it[i].newDynamic}}
+                <p class="aui-ellipsis-1">
+                    {{=it[i].newDynamic}}
+                </p>
+                {{? }}
+			</div>
+	    </div>
+	</div>
+	{{? }}
+    {{ } }}
+    {{??}}
+    <p class="aui-text-center">好可惜，附近还没有好友</p>
+    {{? }}
+    </script>
+	<div class="aui-content aui-clearfix" id="circle-content"></div>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/my_info.js"></script>
+<script type="text/javascript" src="../script/doT.min.js"></script>
+<script type="text/javascript" src="../script/echo.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/circle_person_search.js"></script>
+</html>

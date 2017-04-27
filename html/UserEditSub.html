@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>填写资料</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.hiwall-edit-input {
+				background-color: white;
+				height: 40px;
+				color: #111111;
+				margin-top: 20px;
+				width: 100%;
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+	<div id="template" style="display:none">
+		<div id="secret-selected-tpl">
+			<option selected="selected" id="secret" style="width:50%;" value ="0">保密</option>
+			<option id="man"  value ="1" style="width:50%;">男</option>
+			<option id="woman" style="width:50%;" value ="2">女</option>
+		</div>
+		<div id="man-selected-tpl">
+			<option selected="selected" id="man"  value ="1" style="width:50%;">男</option>
+			<option id="woman" style="width:50%;" value ="2">女</option>
+			<option id="secret" style="width:50%;" value ="0">保密</option>
+		</div>
+		<div id="woman-selected-tpl">
+			<option selected="selected" id="woman" style="width:50%;" value ="2">女</option>
+			<option id="man"  value ="1" style="width:50%;">男</option>
+			<option id="secret" style="width:50%;" value ="0">保密</option>
+		</div>
+	</div>
+		<div style="text-align: center;padding-top: 20px">
+			<img id="user-icon" class="func-node" style="border-radius:50%;width:100px;height:100px" ref-func="selectImage" src="../image/user-icon.png" width="100px">
+			<p class="hiwall-con-blue">
+				头像
+			</p>
+		</div>
+		<section style="padding:10px 8%;">
+			<!--<input class="hiwall-edit-input" placeholder="ID：3-6位数字/字母"/>-->
+			<input id="nickname" class="hiwall-edit-input" placeholder="昵称"/>
+			<select name="sex" id="sex" style="width:102%;border:none" class="hiwall-edit-input">
+			</select>
+			<input id="email" class="hiwall-edit-input" placeholder="邮箱"/>
+			<input id="signature" class="hiwall-edit-input" placeholder="个性签名"/>
+			<!--<input class="hiwall-edit-input" placeholder="地区"/>-->
+			<button ref-func="saveUserInfo" class="func-node hiwall-button-deepblue" style="margin-top: 40px">
+				确定
+			</button>
+			<!--<button class="hiwall-button-border-blue" style="margin-top: 20px">取消</button>-->
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript">
+		var nicknameEle = document.getElementById('nickname');
+		var sexEle = document.getElementById('sex');
+		var signatureEle = document.getElementById('signature');
+		var emailEle = document.getElementById('email');
+		var usericonEle = document.getElementById('user-icon');
+		var openerPage = null;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			refreshPage();
+			openerPage = api.pageParam.openerPage;
+		};
+		function saveUserInfo() {
+			showProgress('提交中...');
+			postJsonAjax(USER_EDIT_API, {
+				"uid" : localStorage.getItem('uid'),
+				"nickname" : nicknameEle.value,
+				"sex" : sexEle.value,
+				"email" : emailEle.value,
+				"signature" : signatureEle.value
+			}, function(ret) {
+				api.toast({
+	                msg:ret
+                });
+				getUserInfo(getUserInfoCallback);
+			});
+		}
+
+		function getUserInfoCallback() {
+			api.sendEvent({
+				name : 'userInfoChange',
+				extra : {
+					key : 'true'
+				}
+			});
+			if (isEmpty(localStorage.getItem("schoolId")) || openerPage == 'Register.html') {
+				redirectView('UserGroup.html', '', true);
+			} else {
+				goBack();
+			}
+		}
+
+		function selectImage() {
+			console.log('head-icon choose');
+			api.actionSheet({
+				title : '请选择图片来源',
+				cancelTitle : '取消',
+				buttons : ['相册选取', '拍照']
+			}, function(ret, err) {
+				if (ret.buttonIndex == 1) {
+					albumChoose();
+				} else if (ret.buttonIndex == 2) {
+					camereChoose();
+				}
+			});
+		}
+
+		function camereChoose() {
+			api.getPicture({
+				sourceType : 'camera',
+				encodingType : 'jpg',
+				mediaValue : 'pic',
+				destinationType : 'url',
+				allowEdit : false,
+				quality : 60,
+				targetWidth : 640,
+				saveToPhotoAlbum : true
+			}, function(ret, err) {
+				var photoList = $api.byId("photoList");
+				if (!isEmpty(ret.data)) {
+					console.log(ret.data);
+					postJsonFileAjax(ICON_UPLOAD_API, {
+						'file' : ret.data
+					}, function(ret) {
+						userIconUpdate(HOST + ret.src, ret.path);
+					});
+				}
+			});
+		}
+
+		function albumChoose() {
+			api.getPicture({
+				sourceType : 'album',
+				encodingType : 'jpg',
+				mediaValue : 'pic',
+				destinationType : 'url',
+				allowEdit : true,
+				quality : 50,
+				targetWidth : 100,
+				targetHeight : 100,
+				saveToPhotoAlbum : false
+			}, function(ret, err) {
+				if (!isEmpty(ret.data)) {
+					console.log(ret.data);
+					postJsonFileAjax(ICON_UPLOAD_API, {
+						'file' : ret.data
+					}, function(ret) {
+						//									userIconEle.setAttribute('src',HOST+ret.src);
+						userIconUpdate(HOST + ret.src, ret.path);
+					});
+				}
+			});
+		}
+
+		function userIconUpdate(imgPath, savePath) {
+			postJsonAjax(ICON_SAVE_API, {
+				'uid' : localStorage.getItem('uid'),
+				'path' : savePath
+			}, function(ret) {
+				usericonEle.setAttribute('src', imgPath);
+				localStorage.setItem('usericon', imgPath);
+				api.sendEvent({
+					name : 'userInfoChange',
+					extra : {
+						key : 'true'
+					}
+				})
+			})
+		}
+
+		function refreshPage() {
+			nicknameEle.value = localStorage.getItem('nickname');
+			console.log(localStorage.getItem('sex'));
+			if(localStorage.getItem('sex') == 1){
+				$api.byId("sex").innerHTML = $api.byId('man-selected-tpl').innerHTML;
+			}else if(localStorage.getItem('sex') == 2){
+				$api.byId("sex").innerHTML = $api.byId('woman-selected-tpl').innerHTML;
+			}else{
+				$api.byId("sex").innerHTML = $api.byId('secret-selected-tpl').innerHTML;
+			}
+			signatureEle.value = localStorage.getItem('signature');
+			emailEle.value = localStorage.getItem('email');
+			usericonEle.src = localStorage.getItem('usericon');
+		}
+	</script>
+</html>

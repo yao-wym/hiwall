@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>登陆</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript">
+		apiready = function() {
+				api.openFrame({
+					name : "LoginSub.html",
+					url : "LoginSub.html",
+					reload : true,
+					rect : {
+						x : 0,
+						y : 0,
+						w : 'auto',
+						h : api.frameHeight
+					},
+					bgColor : '#EEEEEE',
+					bounces : false, //是否弹动
+					vScrollBarEnabled : false, //（可选项）是否显示垂直滚动条
+					hScrollBarEnabled : false, //（可选项）是否显示水平滚动条
+					scaleEnabled : false,//（可选项）页面是否可以缩放，为true时softInputMode参数无效
+				});
+			if ($api.getStorage("isFirst") != 1) {
+				$api.setStorage("isFirst", 1);
+					api.openFrame({
+					name : "Introduction.html",
+					url : "Introduction.html",
+					reload : true,
+					rect : {
+						x : 0,
+						y : 0,
+						w : 'auto',
+						h : api.frameHeight
+					},
+					bgColor : '#EEEEEE',
+					bounces : false, //是否弹动
+					vScrollBarEnabled : false, //（可选项）是否显示垂直滚动条
+					hScrollBarEnabled : false, //（可选项）是否显示水平滚动条
+					scaleEnabled : false,//（可选项）页面是否可以缩放，为true时softInputMode参数无效
+				});
+			} 
+		};
+		function changeFrame(){
+//          api.openFrame({
+//					name : "LoginSub.html",
+//					url : "LoginSub.html",
+//					reload : true,
+//					rect : {
+//						x : 0,
+//						y : 0,
+//						w : 'auto',
+//						h : api.frameHeight
+//					},
+//					bgColor : '#EEEEEE',
+//					bounces : false, //是否弹动
+//					vScrollBarEnabled : false, //（可选项）是否显示垂直滚动条
+//					hScrollBarEnabled : false, //（可选项）是否显示水平滚动条
+//					scaleEnabled : false,//（可选项）页面是否可以缩放，为true时softInputMode参数无效
+//				});
+			api.closeFrame({
+	            name: 'Introduction.html'
+            });
+		}
+	</script>
+</html>

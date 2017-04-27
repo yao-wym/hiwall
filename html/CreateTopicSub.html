@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.comment {
+				width: 680px;
+				margin: 20px auto;
+				position: relative
+			}
+			.comment h3 {
+				height: 28px;
+				line-height: 28px
+			}
+			.com_form {
+				width: 100%;
+				position: relative
+			}
+			.input {
+				width: 99%;
+				height: 60px;
+				border: 1px solid #ccc
+			}
+			.com_form p {
+				height: 28px;
+				line-height: 28px;
+				position: relative
+			}
+			span.emotion {
+				width: 42px;
+				height: 20px;
+				background: url(icon.gif) no-repeat 2px 2px;
+				padding-left: 20px;
+				cursor: pointer
+			}
+			span.emotion:hover {
+				background-position: 2px -28px
+			}
+			.qqFace {
+				margin-top: 4px;
+				background: #fff;
+				padding: 2px;
+				border: 1px #dfe6f6 solid;
+			}
+			.qqFace table td {
+				padding: 0px;
+			}
+			.qqFace table td img {
+				cursor: pointer;
+				border: 1px #fff solid;
+			}
+			.qqFace table td img:hover {
+				border: 1px #0066cc solid;
+			}
+			#show {
+				width: 680px;
+				margin: 20px auto
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<section class="hiwall-bg-gray" style="position: relative">
+			<input id="title" style="margin: 5px;font-size: 18px;width: 80%;line-height:20px;padding:5px" placeholder="输入话题题目(20字)："/>
+			<div class="hiwall-dividing-gray" style="margin-right: 20px"></div>
+			<textarea id="detail" style="margin: 5px;font-size: 16px;width: 90%;height: 200px" placeholder="请输入话题简介(200字)："></textarea>
+		</section>
+		<div style="text-align:center;padding-bottom:50px" class="hiwall-bg-gray">
+			<img class="func-node" ref-func="selectImage" src="../image/addImgBtn.png" id="topic-logo" style="width:256px;height:256px"/>
+		</div>
+		<!--<footer style="position: fixed;bottom: 50px;height: 35px;width: 100%;padding-top: 10px">
+		<div style="display: inline-block;width: 45%;">
+		<input id="logo" style="margin-left: 20px;font-size: 12px;height: 30px;background-color: white;border-radius: 13px;width: 120px" placeholder="输入链接">
+		</div>
+		<div style="float: right;margin-right: 15px">
+		<img src="../image/switch.png" style="width: 45px;margin-top: 2px"/>
+		<span class="hiwall-con-blue" style="position: relative;top:-7px;margin-left: 5px">匿名主持</span>
+		</div>
+		</footer>-->
+		<footer style="position: fixed;bottom: 0;background-color: white;height: 35px;width: 100%;padding-top: 10px">
+			<!--<div style="display: inline-block;width: 23%;text-align: center">
+				<img src="../image/face.png" class="emotion" style="width: 25px;"/>
+			</div>-->
+			<div class="func-node" ref-func="selectImage" style="display: inline-block;width: 33%;text-align: center">
+				<img src="../image/camera.png" style="width: 25px;"/>
+			</div>
+			<div class="func-node" ref-func="inputPwd" style="display: inline-block;width: 33%;text-align: center">
+				<img src="../image/topic-lock.png" style="width: 25px;"/>
+			</div>
+			<div style="display: inline-block;width: 30%;text-align: center; color: #2D3E50">
+				<!--<img src="../image/topic-lock.png" style="width: 25px;"/>-->
+				<span style="position:relative;top:-6px;" id="password"></span>
+			</div>
+		</footer>
+	</body>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript" src="../script/jquery.qqFace.js"></script>
+	<script type="text/javascript">
+		$(function() {
+//			$('.emotion').qqFace({
+//				id : 'facebox', //表情盒子的ID
+//				assign : 'detail', //给那个控件赋值
+//				path : 'face/'	//表情存放的路径
+//			});
+//			$("#facebox").click(function() {
+//				var str = $("#detail").val();
+//				$("#detail").html(replace_em(str));
+//			});
+		});
+		//查看结果
+	</script>
+	<script type="text/javascript">
+		var logoUrlId = "";
+		var topicPwd = '';
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+		};
+		function topicCreate() {
+			var title = document.getElementById('title').value;
+			var detail = document.getElementById('detail').value;
+			showProgress('创建中...');
+			postJsonAjax(TOPIC_CREATE_API, {
+				"uid" : localStorage.getItem('uid'),
+				"title" : title,
+				"group_type" : localStorage.getItem('schoolId'),
+				"detail" : detail,
+				"member_alias" : topicPwd,
+				"logo" : logoUrlId,
+			}, function(msg) {
+			api.sendEvent({
+				name : 'addTopic',
+				extra : {
+					key : 'true'
+				}
+			})
+				api.toast({
+					msg : msg.msg
+				});
+				rongJoinGroup(msg.group_id,title);
+				redirectView('InviteFriends.html', {
+					'fromPage' : 'CreateTopic.html',
+					'topicId' : msg.group_id,
+					'topicName' : title
+				},true);
+			});
+		}
+
+		function uploadImage(imgPath) {
+			var upData = {
+				'file' : imgPath,
+			}
+			console.log('上传图片地址：' + imgPath);
+			postJsonImgAjax(DYNAMIC_IMG_API, upData, function(ret) {
+				if (ret.status == 1) {
+					logoUrlId = ret.data.file.id;
+					console.log('上传完成' + JSON.stringify(ret));
+				} else {
+					api.toast({
+						msg : ret.info
+					});
+				}
+			})
+		}
+
+		function deleteImage(imgPath) {
+			$api.remove($api.dom('.image-list[data-src="' + imgPath + '"]'));
+		}
+
+		function inputPwd() {
+			api.prompt({
+				type : "number",
+				msg : '房间密码',
+				title : '请输入房间密码',
+				buttons : ['确定', '取消']
+			}, function(ret, err) {
+				if (ret.buttonIndex == 1) {
+					console.log('点击了确定' + ret.text);
+					topicPwd = ret.text;
+					$("#password").text(topicPwd);
+				}
+				//coding...
+			});
+		}
+
+		function selectImage() {
+			api.actionSheet({
+				title : '请选择图片来源',
+				cancelTitle : '取消',
+				buttons : ['相册选取', '拍照']
+			}, function(ret, err) {
+				var winWidth = api.winWidth;
+				var listHeight = winWidth / 3 - 12;
+				if (ret.buttonIndex == 1) {
+					//ALBUM
+					var album = api.require('UIMediaScanner');
+					album.open({
+						column : 4,
+						sort : {
+							key : 'time',
+							order : 'desc'
+						},
+						texts : {
+							stateText : '图库',
+							cancelText : '取消',
+							finishText : '完成'
+						},
+						max : 1,
+						styles : {
+							bg : '#fff',
+							mark : {
+								icon : '',
+								position : 'bottom_left',
+								size : 18
+							},
+							nav : {
+								bg : '#3598DC',
+								stateColor : '#ffffff',
+								stateSize : 16,
+								cancleBg : 'rgba(0,0,0,0)',
+								cancelColor : '#ffffff',
+								cancelSize : 16,
+								finishBg : 'rgba(0,0,0,0)',
+								finishColor : '#ffffff',
+								finishSize : 16
+							}
+						}
+					}, function(ret) {
+						if (isEmpty(ret.list)) {
+							return;
+						}
+						console.log(JSON.stringify(ret))
+						if (ret) {
+							api.toast({
+								msg : '正在加载图片',
+								duration : 1000,
+								location : 'top'
+							});
+							$('#topic-logo').attr('src', ret.list[0].thumbPath);
+							api.parseTapmode();
+							console.log(ret.list[0].thumbPath);
+							uploadImage(ret.list[0].thumbPath);
+						}
+					});
+				} else if (ret.buttonIndex == 2) {
+					//TAKE A PHOTO
+					api.getPicture({
+						sourceType : 'camera',
+						encodingType : 'jpg',
+						mediaValue : 'pic',
+						destinationType : 'url',
+						allowEdit : false,
+						quality : 60,
+						targetWidth : 640,
+						saveToPhotoAlbum : true
+					}, function(ret, err) {
+						var photoList = $api.byId("photoList");
+						if (ret.data) {
+							$('#topic-logo').attr('src', ret.data);
+							api.parseTapmode();
+							uploadImage(ret.data);
+						}
+					});
+				}
+			});
+		}
+	</script>
+</html>

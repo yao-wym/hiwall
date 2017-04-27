@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.hiwall-edit-input {
+				background-color: white;
+				height: 40px;
+				color: #EEEEEE;
+				margin-top: 20px;
+				width: 100%;
+			}
+			.setting-icon {
+				width: 20px;
+				position: relative;
+				top: 5px
+			}
+			.next-img {
+				width: 10px;
+				margin-right: 5px;
+				position: relative;
+				top: 3px;
+			}
+			.hiwall-label-white {
+				height: 50px;
+				line-height: 50px;
+			}
+			.label-title {
+				margin-left: 5px;
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<div style="color: #ffffff;text-align: center;height: 220px;padding-top: 20px ;background-image: url(../image/user-bg.png);background-size: 100%">
+			<img id="usericon" class="user-icon link-node" ref-href="UserInfo.html" src="../image/user-icon.png" >
+			<p id="nickname" class="hiwall-con-white"style="margin-top: 10px"></p>
+			<!--<p class="hiwall-con-white" style="margin-top: 15px">wenyao.mnin</p>-->
+		</div>
+		<section style="margin-top: 30px">
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white link-node" ref-href="UserInfo.html">
+				<span><img class="setting-icon" src="../image/userinfo-icon.png"></span>
+				<span class="label-title">个人资料</span>
+				<span class="hiwall-con-deepgray hiwall-label-right"><img class="next-img" style="" src="../image/next.png"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white link-node" ref-href="AppSetting.html">
+				<span><img class="setting-icon" src="../image/setting.png"></span>
+				<span class="label-title">设置</span>
+				<span class="hiwall-con-deepgray hiwall-label-right"><img class="next-img" style="" src="../image/next.png"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white link-node" ref-href='UserGroup.html' reload="true">
+				<span><img class="setting-icon" src="../image/user_group.png"></span>
+				<span class="label-title">我的圈子</span>
+				<span class="hiwall-con-deepgray hiwall-label-right"><img class="next-img" style="" src="../image/next.png"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white link-node" ref-href="AboutHiwall.html">
+				<span><img class="setting-icon" src="../image/aboutus.png"></span>
+				<span class="label-title">关于</span>
+				<span class="hiwall-con-deepgray hiwall-label-right"><img class="next-img" style="" src="../image/next.png"></span>
+			</div>
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript">
+		var usericonEle = document.getElementById("usericon");
+		var nicknameEle = document.getElementById("nickname");
+		function initUcenter() {
+			nicknameEle.innerText = localStorage.getItem('nickname');
+			usericonEle.setAttribute('src', localStorage.getItem('usericon'));
+		}
+
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			initUcenter();
+			initUserInfo();
+			api.addEventListener({
+				name : 'reLogin'
+			}, initUserInfo);
+			api.addEventListener({
+				name : 'userInfoChange'
+			}, initUserInfo);
+			api.addEventListener({
+				name : 'userInfoChange'
+			}, initUcenter);
+		};
+		function initUserInfo() {
+			getUserInfo(initUcenter);
+		}
+
+	</script>
+</html>

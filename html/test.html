@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择地区</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+</head>
+<body>
+	<header class="header hiwall-header">
+        <div class="hiwall-header-left">
+            <img src="../image/back-icon.png">
+        </div>
+        <div class="hiwall-header-title">选择地区</div>
+        <div class="hiwall-header-right">
+             &nbsp;
+        </div>
+	</header>
+</body>
+<script type="text/javascript" src="../script/api.js"></script>
+<script src="../script/zepto.min.js"></script>
+<script>
+    apiready = function () {
+    var navigationBar = api.require("navigationBar");
+var params = {
+    x: 0,
+    y: 64,
+    w: api.frameWidth,
+    h: 49,
+    style: "left_to_right",
+itemSize:{
+        w: 100,
+        h: 100
+    },
+    items: [
+        {
+              title:"title0",
+              titleSelected:"titleSelected0",
+              bg:"#ffff00",
+            alpha: 0.8,
+             bgSelected:"#ff00000"
+        },
+        {
+              title:"title1",
+               titleSelected:"titleSelected1",
+             bg:"#ffff00",
+            alpha: 0.8,
+              bgSelected:"#ff00000"
+        },
+        {
+              title:"title2",
+               titleSelected:"titleSelected2",
+              bg:"#ffff00",
+            alpha: 0.8,
+              bgSelected:"#ff00000"
+        },
+        {
+              title:"title3",
+               titleSelected:"titleSelected3",
+             bg:"#ffff00",
+            alpha: 0.8,
+              bgSelected:"#ff00000"
+        },
+        {
+              title:"title4",
+               titleSelected:"titleSelected4",
+              bg:"#ffff00",
+            alpha: 0.8,
+              bgSelected:"#ff00000"
+        },
+        {
+              title:"title5",
+               titleSelected:"titleSelected5",
+              bg:"#ffff00",
+            alpha: 0.8,
+              bgSelected:"#ff00000"
+        }
+    ],
+selectedIndex: 2,
+    font: {
+        size: 11,
+        sizeSelected: 14,
+        color: "#ff00000",
+        colorSelected: "#ffff00"
+    },
+    bg: "#00ff00",
+    alpha: 1.0,
+    popItem: {
+        position: "tail",
+        title: "打开",
+        titleSelected: "关闭",
+        bg: "#ffff00",
+        bgSelected: "#ff00000"
+    }
+};
+
+function callback(ret, err){
+    if(! ret){
+        api.alert({title: "出错了", msg: err["msg"]});
+        return;
+    }
+
+    api.alert({title: "提示", msg: "您点击了 pop 导航项!"});
+}
+
+navigationBar.open(params, callback);
+    }
+</script> 
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>个人资料</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray" style="padding-top:30px">
+		<section>
+			<div class="hiwall-label-white" style="height: 60px;padding: 5px 10px;line-height: 60px">
+				<span>头像</span>
+				<img id="usericon" style="float: right;height:50px;width:50px;border-radius:50%" src="../image/default-head.png"/>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>昵称</span>
+				<span id="nickname" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>性别</span>
+				<span id="sex" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+		</section>
+		<section style="margin-top: 15px">
+			<!--<div class="hiwall-label-white">
+			<span>生日</span>
+			<span id="birthday" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>-->
+			<div class="hiwall-dividing-gray"></div>
+			<!--<div class="hiwall-label-white">
+			<span>地区</span>
+			<span id="place" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>-->
+			<div class="hiwall-label-white">
+				<span>邮箱</span>
+				<span id="email" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>个性签名</span>
+				<span id="signature" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/doT.min.js"></script>
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			api.addEventListener({
+				name : 'userInfoChange'
+			}, refreshPage);
+			refreshPage();
+		};
+		function refreshPage() {
+			//  	$api.text($api.byId('sex'),$api.getStorage('sex'));
+			//  	$api.text($api.byId('nickname'),$api.getStorage('nickname'));
+			//  	$api.text($api.byId('usericon'),$api.getStorage('usericon'));
+			//  	$api.text($api.byId('place'),$api.getStorage('place'));
+			//  	$api.text($api.byId('signature'),$api.getStorage('signature'));
+			//  	$api.text($api.byId('email'),$api.getStorage('email'));
+			//  	$api.attr($api.byId('usericon'),'src',$api.getStorage('userIcon'));
+			//
+			$api.text($api.byId('sex'), sexText[localStorage.getItem('sex')]===undefined?'保密':sexText[localStorage.getItem('sex')]);
+			$api.text($api.byId('nickname'), localStorage.getItem('nickname'));
+			$api.text($api.byId('place'), localStorage.getItem('place'));
+			$api.text($api.byId('signature'), localStorage.getItem('signature'));
+			$api.text($api.byId('email'), localStorage.getItem('email'));
+			$api.text($api.byId('place'), localStorage.getItem('cityName'));
+			$api.attr($api.byId('usericon'), 'src', localStorage.getItem('usericon'));
+		}
+	</script>
+</html>

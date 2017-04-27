@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <title>圈子</title>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dynamic.css" />
+</head>
+<body>
+	<script id="dynamic-template" type="text/x-dot-template">
+    {{ for(var i in it) { }}
+    {{? isEmpty(it[i].user)}}
+    	alert(1)
+    {{?}}
+    <div class="aui-list-view dynamic-list" id="dynamic_{{=it[i].id}}">
+    	{{? it[i].isvip==1 }}
+    	<div class="vipicon">
+			<img src="../image/vipicon.png">
+		</div>
+		{{? }}
+		<div class="aui-col-xs-12 aui-padded-10">
+			<div class="dynamic-user-avatar">
+				<img src="../image/noavatar.gif" {{? it[i].user.avatar64}}data-echo="{{=HOST+'/'+it[i].user.avatar64}}"{{? }}>
+			</div>
+			<div class="dynamic-user-info">
+				{{? it[i].create_time==0}}
+					<div class="aui-pull-right synchro-loading">
+						<span><img src="../image/synchro.gif"></span>
+						<span id="loading-name-{{=it[i].id}}">同步中</span>
+					</div>
+				{{??}}
+				<div class="aui-pull-right dynamic-time">{{=getLocalTime(it[i].create_time*1000)}}</div>
+				{{? }}
+				<div class="dynamic-user-nickname">
+					<span {{? it[i].isvip==1 }}class="aui-text-danger"{{? }}>{{=it[i].user.nickname}}</span>
+					<!--{{? it[i].sex==1 }}
+					<small class="boy"><span class="aui-iconfont aui-icon-man"></span> {{=it[i].age}}岁</small>
+					{{?? it[i].sex==2 }}
+					<small class="girl"><span class="aui-iconfont aui-icon-women"></span> {{=it[i].age}}岁</small>
+					{{? }}-->
+					<!--{{? it[i].mate==2 }}
+					<small class="feidanshen">非单身</small>
+					{{?? }}
+					<small class="danshen">单身</small>
+					{{? }}-->
+				</div>
+				<!--<p>
+					{{=it[i].company}}
+				</p>-->
+			</div>
+		</div>
+		<div class="aui-line-x aui-clearfix"></div>
+		<div class="aui-col-xs-12" tapmode {{? it[i].create_time!=0}}onclick="show('{{=it[i].id}}');"{{? }} >
+			<div class="aui-padded-10 dynamic-content">{{=replace_em(it[i].content)}}</div>
+			{{? it[i].img }}
+			<ul class="aui-thumb-view">
+				{{ for(var k in it[i].img) { }}
+					{{? it[i].img.length>=3}}
+						{{? k<6 }}
+			            <li class="aui-list-view-cell aui-img aui-col-xs-4">
+			                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=HOST+'/'+it[i].img[k]}}">
+			            </li>
+			            {{? }}
+			        {{?? it[i].img.length==2}}
+			        	<li class="aui-list-view-cell aui-img aui-col-xs-6">
+			                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=HOST+'/'+it[i].img[k]}}">
+			            </li>
+			        {{?? it[i].img.length==1}}
+			        	<li class="aui-list-view-cell aui-img aui-col-xs-12">
+			                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=HOST+'/'+it[i].img[k]}}">
+			            </li>
+			        {{? }}
+			    {{ } }}    
+	        </ul>
+
+			{{? }}
+		</div>	
+		<!--<div class="dynamic-otherinfo aui-clearfix">
+			{{? it[i].vendor}}
+	        <p><small class="aui-iconfont aui-icon-phone">{{=it[i].vendor}}</small></p>
+	        {{? }}
+	        {{? it[i].myaddress && it[i].showaddress==1}}
+	        <p><small>{{=it[i].myaddress}}</small></p>
+	        {{? }}
+        </div>-->
+        <div class="aui-line-x"></div>
+        {{? it[i].id>0}}
+        <div class="aui-col-xs-12 dynamic-btn">
+        	<div class="aui-col-xs-6 aui-iconfont aui-icon-duihuaxinxi"  tapmode {{? it[i].create_time!=0}}onclick="show('{{=it[i].id}}');"{{? }} id="replyTotal_{{=it[i].id}}"> {{=it[i].comment_count}}</div>
+        	<div class="aui-col-xs-6 aui-iconfont aui-icon-zan" tapmode {{? it[i].create_time!=0}}onclick="laud('{{=it[i].id}},{{=it[i].support_count}}');"{{? }})" id="laudTotal_{{=it[i].id}}"> {{=it[i].support_count}}</div>
+        	<!--<div class="aui-col-xs-4 aui-iconfont aui-icon-goods" tapmode onclick="reward({{=it[i].id}})"> 打赏</div>-->
+        </div>
+        {{? }}
+    </div>
+    {{ } }}
+    </script>
+    <!--<div class="aui-content topbanner">
+    	<div class="aui-col-xs-12">
+	    	<div class="aui-col-xs-8" tapmode onclick="myWallet();">
+	    		<div class="todayget">
+	    			<div class="coin"><strong id="coinToday">0</strong></div>
+	    		</div>
+	    	</div>
+	    	<div class="aui-col-xs-4 aui-text-center total">
+	    		<p style="font-size:12px;">总资产</p>
+	    		<p id="coinTotal">0</p>
+	    	</div>
+    	</div>
+    </div>-->
+    <div class="aui-content weekday" id="weekday" tapmode onclick="dynamicAdd()">
+    	<img src="../image/weekday.png">
+    </div>
+	<div class="aui-content" id="dynamic-content"></div>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/echo.js"></script>
+<script type="text/javascript" src="../script/doT.min.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/dynamic_list.js"></script>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dynamic_show.css" />
+</head>
+<body>
+	<div id="wrap">
+		<div class="aui-content" id="dynamic-content"></div>
+		<div  id="dynamic-reward"></div>
+		<div class="aui-content aui-clearfix dynamic-reply aui-padded-10">
+			<div class="dynamic-reply-title">
+				回复
+				<span class="aui-pull-right aui-iconfont aui-icon-unfold"></span>
+			</div>
+			<div id="dynamic-reply">
+				<div class="dynamic-reply-no" id="noReply">
+					<img src="../image/noreply.png">
+					<p>暂无评论，赶快抢沙发</p>
+				</div>
+			</div>
+	    </div>
+    </div> 
+	<script id="dynamicShow-template" type="text/x-dot-template">
+	<div class="aui-list-view dynamic-list">
+		{{? it.isvip==1 }}
+    	<div class="vipicon">
+			<img src="../image/vipicon.png">
+		</div>
+		{{? }}
+		<div class="aui-col-xs-12 aui-padded-10" tapmode onclick="spaceShow({{=it.uid}});">
+			<div class="dynamic-user-avatar">
+				<img src="../image/noavatar.gif" {{? it.user.avatar64}}data-echo="{{=HOST+'/'+it.user.avatar64}}"{{? }}>
+			</div>
+			<div class="dynamic-user-info">
+				{{? it.inputtime==0}}
+					<div class="aui-pull-right synchro-loading">
+						<span><img src="../image/synchro.gif"></span>
+						<span>同步中</span>
+					</div>
+				{{??}}
+				<div class="aui-pull-right dynamic-time">{{=getLocalTime(it.create_time*1000)}}</div>
+				{{? }}
+				<div class="dynamic-user-nickname">
+					<span {{? it.isvip==1 }}class="aui-text-danger"{{? }}>{{=it.user.nickname}}</span>
+					<!--{{? it.sex==1 }}-->
+					<!--<small class="boy"><span class="aui-iconfont aui-icon-man"></span> {{=it.age}}岁</small>-->
+					<!--{{?? it.sex==2 }}-->
+					<small class="girl"><span class="aui-iconfont aui-icon-women"></span> {{=it.user.title}}</small>
+					<!--{{? }}-->
+					<!--{{? it.mate==2 }}
+					<small class="feidanshen">非单身</small>
+					{{?? }}
+					<small class="danshen">单身</small>
+					{{? }}-->
+				</div>
+				<!--<p>
+					{{=it.company}}
+				</p>-->
+			</div>
+		</div>
+		<div class="aui-line-x aui-clearfix"></div>
+		<div class="aui-col-xs-12 aui-padded-10 dynamic-content">{{=replace_em(it.content)}}</div>
+		{{? it.img }}
+		<ul class="aui-thumb-view">
+			{{ for(var k in it.img) { }}
+				{{? it.img.length>=3}}
+		            <li class="aui-list-view-cell aui-img aui-col-xs-4" tapmode onclick="imageBrowser({{=k}});">
+		                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=it.img[k]}}">
+		            </li>
+		        {{?? it.img.length==2}}
+		        	<li class="aui-list-view-cell aui-img aui-col-xs-6" tapmode onclick="imageBrowser({{=k}});">
+		                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=it.img[k]}}">
+		            </li>
+		        {{?? it.img.length==1}}
+		        	<li class="aui-list-view-cell aui-img aui-col-xs-12" tapmode onclick="imageBrowser({{=k}});">
+		                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=it.img[k]}}">
+		            </li>
+		        {{? }}
+		    {{ } }}    
+        </ul>
+		{{? }}
+        <!--<div class="dynamic-otherinfo aui-clearfix">
+        	{{? it.vendor}}
+	        <p><small class="aui-iconfont aui-icon-phone">{{=it.vendor}}</small></p>
+	        {{? }}
+	        {{? it.myaddress && it.showaddress==1}}
+	        <p><small>{{=it.myaddress}}</small></p>
+	        {{? }}
+	        
+        </div>-->
+        <div class="aui-line-x"></div>
+        <div class="aui-col-xs-12 dynamic-btn">
+        	<div class="aui-col-xs-4 aui-iconfont aui-icon-duihuaxinxi" id="replyTotal" tapmode> {{=it.comment_count}}</div>
+        	<div class="aui-col-xs-4 aui-iconfont aui-icon-zan" id="laudTotal" tapmode onclick="laud({{=it.support_count}});"> {{=it.support_count}}</div>
+        	<div class="aui-col-xs-4 aui-iconfont aui-icon-info" tapmode onclick="report({{=it.support_count}});"> 举报</div>
+        	<!--<div class="aui-col-xs-4 aui-iconfont aui-icon-goods" tapmode onclick="reward()">打赏</div>-->
+        </div>
+    </div>
+    </script>
+    <script id="dynamicReply-template" type="text/x-dot-template">
+    {{ for(var i in it) { }}
+    <div class="aui-list-view dynamic-reply-list">
+		<div class="aui-col-xs-12">
+			<div class="dynamic-reply-avatar">
+				<img src="../image/noavatar.gif" {{? it[i].user.avatar32}}data-echo="{{=HOST+'/'+it[i].user.avatar32}}"{{? }}>
+			</div>
+			<div class="dynamic-reply-info" tapmode>
+				<div class="dynamic-reply-info-title">
+					<span class="nickname">{{=it[i].user.nickname}}</span>
+					<!--{{? it[i].userid != it[i].touid}}
+					<span class="aui-text-primary"> 回复 </span>
+					<span class="nickname">{{=it[i].tonickname}}</span>
+					{{? }}-->
+					<span class="aui-pull-right">{{=getLocalTime(it[i].create_time*1000)}}</span>
+				</div>
+				<p>{{=it[i].content}}</p>
+			</div>
+        </div>
+    </div>
+    {{ } }}
+    </script>
+    <script id="reward-template" type="text/x-dot-template">
+    <div class="aui-content" style="padding-top:0; padding-bottom:0;">
+    {{? it.total>0}}
+    <div class="aui-content aui-clearfix dynamic-reward aui-padded-10">
+		<div class="dynamic-reward-title">
+			感谢以下土豪打赏的驴豆
+			<span class="aui-pull-right">共获得了 {{=it.total}} 驴豆</span>
+		</div>
+		<div>
+		    <div class="aui-list-view dynamic-reward-list" >
+		    	{{ for(var i in it.datas) { }}
+				<div class="aui-col-xs-2" tapmode onclick="spaceShow({{=it.datas[i].userid}})">
+					<img src="../image/noavatar.gif" {{? it.datas[i].avatar}}data-echo="{{=it.datas[i].avatar}}"{{? }}>
+				</div>
+				{{ } }}
+		    </div>
+		    
+		</div>
+    </div>
+    {{? }}
+    </div>
+    </script>
+      
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/dynamic_show.js"></script>
+<script type="text/javascript" src="../script/doT.min.js"></script>
+<script type="text/javascript" src="../script/echo.js"></script>
+<script type="text/javascript" src="../script/my_info.js"></script>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择地区</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+</head>
+<body class="hiwall-bg-gray">
+<header class="header hiwall-header">
+    <div class="hiwall-header-left func-node" ref-func="goBack">
+        <img src="../image/back-icon.png">
+    </div>
+    <div class="hiwall-header-title">话题成员</div>
+    <div class="hiwall-header-right" id="InviteFriends">
+        <img src="../image/add-white.png" style="width: 25px;margin-top: 12px">
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/rongyun.js"></script>
+<script src="../script/zepto.min.js"></script>
+<script>
+apiready = function () {if(typeof initPage=="function"){initPage()}
+	getTopicMemberList();
+	$('#InviteFriends').click(function(){
+		redirectView('InviteFriends.html',{'topicId':api.pageParam.topicId,'topicName':api.pageParam.topicName},true);
+	});
+}
+function getTopicMemberList(){
+    api.showProgress();
+	api.ajax({
+	        url:TOPIC_USER_LIST_API+'/'+localStorage.getItem('topicId'),
+	        method: 'get',
+    		timeout: 30,
+    		dataType: 'json',
+        },function(ret,err){
+        	api.hideProgress();
+        	//coding...
+        	console.log(JSON.stringify(ret));
+        	if(ret.state==true){
+        		var memberList = new Array();
+        		if(ret.content.member_list == ''){
+        			return;
+        		}
+        		for(var i=0;i<ret.content.member_list.length;i++){
+        			if(isEmpty(ret.content.member_list[i].user)){
+        				continue;
+        			}
+        			var member = {icon:"widget://image/friend-invite.png"};
+        			member['uid'] = ret.content.member_list[i].uid;
+        			member['title'] = ret.content.member_list[i].user.nickname;
+        			member['imgPath'] = HOST+"/"+ret.content.member_list[i].user.avatar64;
+        			memberList.push(member)
+					if(i==0){
+        				member['subTitle'] = '群主';
+					}
+        		}
+        		loadMemberList(memberList)
+        	}else{
+        		alert(ret.content.info);
+        	}
+        });
+}
+function loadMemberList(memberList){
+
+	  var obj2 = api.require('UIListView');
+	obj2.open({
+    rect: {
+        x: 0,
+        y: 65,
+        h: api.frameHeight
+    },
+    data: memberList,
+//  [
+//  {
+//      imgPath: 'widget://image/user-icon.png',
+//      title: '标题',
+//      subTitle: '子标题，说明文字',
+////      remark: '备注',
+//      icon: ''
+//  }],
+    rightBtns: [{
+        bgColor: '#388e8e',
+        activeBgColor: '',
+        width: 70,
+        title: '添加',
+        titleSize: 12,
+        titleColor: '#fff',
+        icon: '',
+        iconWidth: 20
+    }],
+    styles: {
+        borderColor: '#CCCCCC',
+        item: {
+            bgColor: '#efefef',
+            activeBgColor: '#F5F5F5',
+            height: 70.0,
+            imgWidth: 55,
+            imgHeight: 55,
+            placeholderImg: '',
+            titleSize: 18.0,
+            titleColor: '#000',
+            subTitleSize: 13.0,
+            subTitleColor: '#a0a0a0', 
+//          remarkColor: '#000',
+//          remarkSize: 16,
+//          remarkIconWidth: 30
+        }
+    },
+    fixedOn:  api.frameName
+}, function(ret){
+	var eventType = ret.eventType;
+	obj2.getDataByIndex({
+    index: ret.index
+},function(ret){
+    var friendsId = ret.data.uid;
+    if(eventType=="clickRemark"){
+    	addFriends(ret.data.uid,function(){
+    		api.toast({
+	            msg:'好友请求已发送'
+            });
+    	});
+	}else if(eventType=="clickContent"){
+//		localStorage.setItem('friendsid',friendsId);
+//		redirectView('ChatRoom.html',{'friends':ret.data});
+		redirectView('FriendsCenter.html',{'uid':ret.data.uid});
+	}else if(eventType=="clickImg"){
+		redirectView('FriendsCenter.html',{'uid':ret.data.uid});
+	}
+	else if(eventType=="clickRightBtn"){
+    	addFriends(ret.data.uid);
+	}
+});
+
+});
+}
+</script>
+</html>

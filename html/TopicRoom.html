@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<style>
+		</style>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body class="hiwall-bg-gray">
+		<header id="hiwall-header" class="hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div id="topic-name" class="hiwall-header-title" style="font-size: 17px">
+				
+			</div>
+			<div class="hiwall-header-right" id="TopicMemberList">
+				<img src="../image/friend_add.png">
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<!--<script type="text/javascript" src="../script/chat.js"></script>-->
+	<script type="text/javascript">
+		var secretKey, topicId, topicName;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			topicId = api.pageParam.topicId;
+			topicName = api.pageParam.topicName;
+			secretKey = api.pageParam.secretKey;
+			$api.byId('topic-name').innerText = topicName;
+			localStorage.setItem('topicId', topicId);
+			enterGroup(topicId);
+			api.parseTapmode();
+			api.addEventListener({
+				name : 'joinTopic'
+			}, function(ret, err) {
+				showTopicRoom()
+			});
+			$('#TopicMemberList').click(function() {
+				redirectView('TopicMemberList.html', {
+					'topicId' : api.pageParam.topicId,
+					'topicName' : api.pageParam.topicName
+				},true);
+			});
+		}
+		function joinTopic(topicId, topicName) {
+			showProgress('加入中...');
+			api.ajax({
+				url : GROUP_JOIN_API,
+				method : 'post',
+				timeout : 30,
+				dataType : 'json',
+				data : {
+					values : {
+						"uid" : localStorage.getItem('uid'),
+						"group_id" : topicId
+					}
+				}
+			}, function(ret, err) {
+				api.hideProgress();
+				console.log(JSON.stringify(ret));
+				api.sendEvent({
+					name : 'joinTopic',
+				});
+				rongJoinGroup(topicId, topicName);
+			});
+		}
+
+		function showTopicRoom() {
+			//			joinGroup(topicId, topicName);
+			api.closeFrame({
+				name : 'TopicLockRoom.html'
+			});
+			openSubFrame('TopicRoomSub.html');
+		}
+
+		function enterGroup(topicId) {
+			showProgress('进入中...');
+			getJsonAjax(GROUP_JOIN_STATE_API, {
+				'group_id' : topicId,
+				'uid' : localStorage.getItem('uid')
+			}, function(ret) {
+				console.log(ret);
+				console.log(isEmpty(secretKey));
+				api.hideProgress();
+				if (ret == 0 && !isEmpty(secretKey)) {
+					openSubFrame('TopicLockRoom.html');
+				}
+				else if (ret == 0 && isEmpty(secretKey)) {
+					api.confirm({
+						title : api.pageParam.topicName,
+						msg : api.pageParam.topicTips,
+						buttons : ['取消', '加入']
+					}, function(ret, err) {
+						if (ret.buttonIndex == 1) {
+							goBack();
+						} else if (ret.buttonIndex == 2) {
+							joinTopic(topicId, topicName);
+						}
+					});
+				} else {
+					//					rongJoinGroup(topicId, topicName);
+					openSubFrame('TopicRoomSub.html');
+				}
+			});
+		}
+	</script>
+</html>

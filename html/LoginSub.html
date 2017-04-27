@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>登陆</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-blue hiwall-con-white">
+		<header style="width:100%;text-align:center;padding-top:10%">
+			<img src="../image/logo.png" width="100px"/>
+		</header>
+		<section class="hiwall-bg-blue" style="padding:20px 8%;">
+			<div style="height:100px;border-radius:5px;background-color:#D7EAF8">
+				<div style="height:35px;padding-left:6px;padding-top:15px">
+					<label class="hiwall-con-blue" style="float:left;width:15%;text-align:center">账号</label>
+					<div class="hiwall-ver-dividing-blue" style="float:left;height:18px;margin-top:1px;margin-left:5px"></div>
+					<input id="username" style="display:inline-block;width:80%;input-style:none" />
+				</div>
+				<div class="hiwall-dividing-gray"></div>
+				<div style="height:34px;padding-left:6px;padding-top:15px">
+					<label class="hiwall-con-blue" style="float:left;width:15%;text-align:center">密码</label>
+					<div class="hiwall-ver-dividing-blue" style="float:left;height:18px;margin-top:1px;margin-left:5px"></div>
+					<input id="password" style="display:inline-block;width:80%;input-style:none" />
+				</div>
+			</div>
+			<div style="margin-top:20px;font-size:13px;height:40px">
+				<!--<div style="float:left">
+				<input style="display:none" type="checkbox"/>
+				<img src="../image/remember.png" style="float:left" height="13px"/>
+				<span style="margin-left:4px;">记住密码</span>
+				</div>-->
+				<!--<div style="float:right">
+				<span>忘记密码</span>
+				</div>-->
+			</div>
+			<div style="font-size:14px;text-align:center">
+				<button ref-func="userLogin" style="width:88%;margin-top:10px;height:35px;border-radius:5px" class="func-node hiwall-bg-deep-blue hiwall-con-white">
+					登陆
+				</button>
+				<button style="width:88%;margin-top:10px;height:35px;border-radius:5px" ref-href="Register.html" class="hiwall-bg-blue hiwall-border-deep-blue hiwall-con-white link-node">
+					注册
+				</button>
+			</div>
+		</section>
+		<footer class="hiwall-bg-blue" style="padding:20px 12%;">
+			<div style="text-align:center;">
+				<span style="display;inline-block;width:20%;height:1px;position:relative;bottom:5px;background-color:white"></span>
+				<span>或用其它账号登陆</span>
+				<span style="display;inline-block;width:20%;position:relative;bottom:5px;height:1px;background-color:white"></span>
+			</div>
+			<div style="text-align:center;margin-top:30px">
+				<span style="width:30%"> <img class="func-node" ref-func="qqLogin" style="width:35px;height:35px" src="../image/QQ.png"></img> </span>
+				<span style="width:30%"> <img class="func-node" ref-func="weiboLogin" style="width:35px;height:35px" src="../image/sina.png"></img> </span>
+				<span style="width:30%"> <img class="func-node" ref-func="wxLogin" style="width:35px;height:35px" src="../image/weixin.png"></img> </span>
+			</div>
+		</footer>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript" src="../script/update.js"></script>
+	<script type="text/javascript">
+		var first = null;
+		var authUserId = null;
+		var wx_accessToken = null;
+		var wx_openid = null;
+		var wx_dynamicToken = null;
+		var wx_code = null;
+		apiready = function() {
+//			if($api.getStorage("isFirst") == 0){
+//				op
+//			}
+			if ( typeof onPageInit == "function") {
+				onPageInit();
+			}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			checkUpdate();
+			localStorage.setItem('uid', "");
+			localStorage.setItem('token', "");
+			localStorage.setItem('password', "");
+			localStorage.setItem('username', "");
+			localStorage.setItem('connected', 0);
+			localStorage.setItem('nickname', "");
+			localStorage.setItem('sex', "");
+			localStorage.setItem('signature', "");
+			localStorage.setItem('email', "");
+			localStorage.setItem('usericon', "");
+			localStorage.setItem('schoolId', "");
+			localStorage.setItem('schoolName', "");
+			if (!isEmpty(localStorage.getItem('password'))) {
+				userLogin();
+			}
+			//双击退出
+			api.addEventListener({
+				name : 'keyback'
+			}, function(ret, err) {
+				if (!first) {
+					first = new Date().getTime();
+					api.toast({
+						msg : '再按一次退出',
+						duration : 1500,
+						location : 'bottom'
+					});
+					setTimeout(function() {
+						first = null;
+					}, 1500);
+				} else {
+					if (new Date().getTime() - first < 1500) {
+						api.closeWidget();
+					}
+				}
+			});
+		};
+		function qqLogin() {
+			console.log('qq auth');
+			showProgress();
+			var obj = api.require('qq');
+			obj.login(function(ret, err) {
+				api.hideProgress();
+				getUserAuthInfo('qq');
+				authUserId = 'QQ' + ret.openId.substring(0, 10);
+				console.log(JSON.stringify(ret));
+			});
+		}
+
+		function wxLogin() {
+			console.log('weiXin auth');
+			showProgress();
+			var wx = api.require('wx');
+			wx.auth({
+				apiKey : ''
+			}, function(ret, err) {
+				api.hideProgress();
+				if(err.code == 3){
+					api.toast({
+							msg : "微信未安装"
+						});
+						return;
+				}
+				if (ret.status) {
+					console.log(JSON.stringify(ret));
+					wx_code = ret.code;
+					wx.getToken({
+						'code' : wx_code
+					}, function(ret, err) {
+						if (ret.status) {
+							console.log(JSON.stringify(ret));
+							wx_accessToken = ret.accessToken;
+							wx_openid = ret.openId;
+							getUserAuthInfo('weixin');
+						} else {
+//						api.toast({
+//							msg : err.msg
+//						});
+						}
+					});
+				} else {
+//					api.toast({
+//							msg : err.msg
+//						});
+				}
+			});
+		}
+
+		function weiboLogin() {
+			console.log('weibo auth');
+			showProgress();
+			var weibo = api.require('weibo');
+			weibo.auth(function(ret, err) {
+				api.hideProgress();
+				console.log(JSON.stringify(err))
+				if (ret.status) {
+					authUserId = "WEIBO" + ret.userId;
+					console.log(JSON.stringify(ret));
+					getUserAuthInfo('weibo');
+				}
+			});
+		}
+
+		function userLogin() {
+			var username = document.getElementById('username').value;
+			var password = document.getElementById('password').value;
+			showProgress('登录中...');
+			console.log('登陆');
+			postJsonAjax(LOGIN_API, {
+				"username" : username,
+				"password" : password
+			}, loginCallback);
+		}
+
+		function authLogin() {
+			var username = localStorage.getItem('username');
+			var password = localStorage.getItem('password');
+			showProgress('登录中...');
+			postJsonAjax(LOGIN_API, {
+				"username" : username,
+				"password" : password
+			}, loginCallback);
+		}
+
+		function loginCallback(responseData) {
+			$api.clearStorage();
+			console.log('登陆回调');
+			localStorage.setItem('uid', responseData.uid);
+			localStorage.setItem('nickname', responseData.user_info.nickname);
+			localStorage.setItem('usericon', HOST + "/" + responseData.user_info.avatar128);
+			console.log('uid=' + localStorage.getItem('uid'));
+			//			localStorage.setItem('title', responseData.user_info.title);
+			//			localStorage.setItem('signature', responseData.user_info.signature);
+			api.sendEvent({
+				name : 'reLogin',
+				extra : {
+					key : 'true'
+				}
+			});
+			if (!isEmpty(localStorage.getItem('schoolId'))) {
+				redirectView('index.html');
+			} else {
+				redirectView('UserGroup.html', '', true);
+			}
+		}
+
+		function getUserAuthInfo(type) {
+			if (type == 'weibo') {
+				var weibo = api.require('weibo');
+				weibo.getUserInfo({
+					token : '',
+					userId : ''
+				}, function(ret, err) {
+					console.log(JSON.stringify(err));
+					console.log(JSON.stringify(ret));
+					if (ret.status) {
+						if (ret.userInfo.gender == "m") {
+							var sex = 1;
+						} else if (ret.userInfo.gender == "w") {
+							var sex = 2;
+						} else {
+							var sex = 0;
+						}
+						var nickname = 'weibo_' + ret.userInfo.name;
+						var city = ret.userInfo.location;
+						var icon = ret.userInfo.profile_image_url;
+						console.log(JSON.stringify(ret.userInfo));
+						authReg(authUserId, authUserId, nickname);
+					}
+				});
+			} else if (type == 'weixin') {
+				var wx = api.require('wx');
+				wx.getUserInfo({
+					accessToken : wx_accessToken,
+					openId : wx_openid
+				}, function(ret, err) {
+					if (ret.status) {
+						//						alert(JSON.stringify(ret));
+						var nickname = 'weixin_' + ret.nickname;
+						var authUserId = 'WX' + ret.openid.substring(0, 10);
+						//						var sex = ret.info.gender;
+						//						var city = ret.info.city;
+						//						var icon = ret.info.figureurl_qq_2;
+						authReg(authUserId, authUserId, nickname)
+					} else {
+						console.log(err.code);
+						if (err.code == 1) {
+							var wx = api.require('wx');
+							wx.refreshToken({
+								dynamicToken : wx_accessToken
+							}, function(ret, err) {
+								if (ret.status) {
+									console.log(JSON.stringify(ret));
+									wx_openid = ret.openId;
+									wxLogin();
+								} else {
+									api.toast({
+										msg : err.msg
+									});
+								}
+							});
+						}
+					}
+				});
+			} else if (type == 'qq') {
+				var obj = api.require('qq');
+				obj.getUserInfo(function(ret, err) {
+					console.log(JSON.stringify(err));
+					console.log(JSON.stringify(ret));
+					if (ret.status) {
+						var nickname = 'qq_' + ret.info.nickname;
+						//						var sex = ret.info.gender;
+						//						var city = ret.info.city;
+						//						var icon = ret.info.figureurl_qq_2;
+						authReg(authUserId, authUserId, nickname)
+					} else {
+						console.log(err.msg);
+						api.toast({
+							msg : err.msg
+						});
+					}
+				});
+			}
+		}
+
+		function authReg(username, password, nickname) {
+			postJsonAjax(AUTH_REG_API, {
+				'username' : username,
+				'nickname' : nickname,
+				'password' : password
+			}, function(ret) {
+				localStorage.setItem('uid', ret.content);
+				localStorage.setItem('password', password);
+				localStorage.setItem('nickname', nickname);
+				localStorage.setItem('username', username);
+				redirectView('UserEdit.html', {
+					'openerPage' : 'Register.html'
+				}, true);
+			}, function(ret) {
+				localStorage.setItem('password', password);
+				localStorage.setItem('username', username);
+				authLogin();
+			});
+		}
+	</script>
+</html>

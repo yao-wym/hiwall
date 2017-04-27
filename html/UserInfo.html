@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>个人资料</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+    <style>
+        body{
+        }
+    </style>
+</head>
+<body class="hiwall-bg-gray">
+<header class="hiwall-header">
+     <div class="hiwall-header-left func-node" ref-func="goBack"> 
+         <img src="../image/back-icon.png">
+     </div>
+    <div class="hiwall-header-title">个人资料</div>
+    <div class="hiwall-header-right link-node" ref-href="UserEdit.html" reload='true'>
+        <img src="../image/add-white.png" style="width: 25px;margin-top: 12px">
+    </div>
+</header>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/doT.min.js"></script>
+<script type="text/javascript">
+    apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+    	openSubFrame('UserInfoSub.html');
+    };
+</script>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>添加学校</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<script type="text/javascript" src="../script/zepto.js"></script>
+		<script type="text/javascript" src="../script/doT.min.js"></script>
+		<script type="text/javascript" src="../script/api.js"></script>
+		<script type="text/javascript" src="../script/base.js"></script>
+		<script type="text/javascript" src="../script/hiwall.js"></script>
+		<script type="text/javascript" src="../script/echo.js"></script>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray" style="padding-top:30px">
+		<script id="group-template" type="text/x-dot-template">
+			<section style="margin-top: 0px">
+			{{ for(var i in it) { }}
+			{{? !isEmpty(it[i])&&it[i].groupcate_class==1 }}
+			<div group-id={{=it[i].groupcate_id}} ref-func="changeGroup" class="func-node hiwall-label-white">
+			{{=it[i].groupcate_name}}
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			{{?}}
+			{{ } }}
+			<div class="hiwall-label-white link-node" ref-href="CityChoose.html" ref-info='1' reload='true'>
+			<span style="color: #bbbbbb">添加学校</span>
+			<span class="hiwall-con-deepgray hiwall-label-right" style="font-weight: 500;font-size: 22px">+</span>
+			</div>
+			</section>
+			<section style="margin-top: 15px">
+			{{ for(var i in it) { }}
+			{{? !isEmpty(it[i])&&it[i].groupcate_class==2 }}
+			<div group-id={{=it[i].groupcate_id}} ref-func="changeGroup" class="hiwall-label-white func-node">
+			{{=it[i].groupcate_name}}
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			{{?}}
+			{{ } }}
+			<div class="hiwall-label-white link-node" ref-href="CityChoose.html" ref-info='2' reload='true'>
+			<span style="color: #bbbbbb">添加职业</span>
+			<span class="hiwall-con-deepgray hiwall-label-right" style="font-weight: 500;font-size: 22px">+</span>
+			</section>
+		</script>
+		<div id="group-content" class="hiwall-bg-gray"></div>
+	</body>
+	<script type="text/javascript">
+		apiready = function() {
+			if ( typeof onPageInit == "function") {
+				onPageInit();
+			}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			showProgress();
+			getGroupList();
+		};
+		function getGroupList() {
+			getJsonAjax(USER_GROUP_LIST_API, {
+				'uid' : localStorage.getItem('uid')
+			}, initGroupList, initGroupList);
+		}
+
+		function changeGroup() {
+			var groupId = event.srcElement.getAttribute('group-id');
+			var groupName = event.srcElement.innerText;
+			localStorage.setItem('schoolId', groupId);
+			localStorage.setItem('schoolName', groupName);
+			api.sendEvent({
+				name : 'reChooseSchool',
+				extra : {
+				}
+			});
+			api.openWin({
+				name : 'index.html',
+				url : 'index.html',
+				delay:1000,
+			});
+			showProgress();
+			setTimeout("api.hideProgress();",1000);
+		}
+
+		function initGroupList(groupList) {
+			api.hideProgress();
+			console.log(JSON.stringify(groupList));
+			var content = $api.byId('group-content');
+			content.innerHTML = '';
+			var tpl = $api.byId('group-template').text;
+			var tempFn = doT.template(tpl);
+			$api.prepend(content, tempFn(groupList));
+			echo.init({
+				offset : 0,
+				throttle : 250
+			});
+		}
+	</script>
+</html>

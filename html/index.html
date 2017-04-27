@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<style>
+		.homelist-tab {
+			display: inline-block;
+			line-height: 27px;
+			list-style: none;
+			width: 65px;
+			position: relative;
+			top: -10px;
+			outline: none;
+			font-size: 17px
+		}
+		.homelist-tab-active {
+			outline: none;
+			border: none;
+			display: inline-block;
+			list-style: none;
+			color: #3598DC;
+			background-color: #ffffff;
+			width: 65px;
+			position: relative;
+			top: -10px;
+			font-size: 17px
+		}
+		.drop-pointer-close {
+			border: 5px solid transparent;
+			border-top: 7px solid #fff;
+			width: 0;
+			height: 0px;
+			margin-top: 3px;
+			position: relative;
+			top: 2px;
+		}
+		.drop-pointer-open {
+			border: 5px solid transparent;
+			border-bottom: 7px solid #fff;
+			width: 0;
+			height: 0px;
+			margin-top: 3px;
+			position: relative;
+			bottom: 2px;
+		}
+		.new-msg-tips {
+			left: 1px;
+			top: 1px;
+			position: absolute;
+			display: inline-block;
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background-color: red;
+		}
+	</style>
+	<body class="hiwall-bg-gray">
+		<header id="tab-0" class="header hiwall-header">
+			<div class="hiwall-header-left"></div>
+			<div class="hiwall-header-title func-node" ref-func="showGroupDrop">
+				<span id="school-name"></span>
+				<span id="group-drop-pointer" class="drop-pointer-close"></span>
+			</div>
+			<div class="hiwall-header-right link-node" ref-href="CreateTopic.html" reload='true'>
+				<img src="../image/add-white.png">
+			</div>
+		</header>
+		<header id="tab-1" class="header hiwall-header hiwall-hidden">
+			<div class="hiwall-header-left">
+				<!--<img src="../image/back-icon.png">-->
+			</div>
+			<div class="hiwall-header-title" style="line-height:45px">
+				<ul style="display:inline-block;height:27px;margin-top:9px;margin-bottom:-3px;">
+					<li tabindex="0" style="border:solid 1px #fff;border-top-left-radius: 5px;border-bottom-left-radius: 5px;margin-right:-3px;" class="homelist-tab">
+						私聊 
+						<div id="new-msg-mark"></div>
+					</li>
+					<li tabindex="1" style="border-top:solid 1px white;border-bottom:solid 1px white;margin-right:-3px;margin-left:-3px;" class="homelist-tab homelist-tab-active">
+						朋友
+					</li>
+					<li tabindex="2" class="homelist-tab" style="border:solid 1px #fff;border-top-right-radius: 5px;border-bottom-right-radius: 5px;margin-left:-3px;">
+						话题
+					</li>
+				</ul>
+			</div>
+			<div class="hiwall-header-right">
+				<!--<img src="../image/add-white.png" style="width: 25px;margin-top: 12px">-->
+			</div>
+		</header>
+		<header id="tab-2" class="hiwall-header hiwall-hidden">
+			<div class="hiwall-header-left">
+				<!--<img src="../image/back-icon.png">-->
+			</div>
+			<div class="hiwall-header-title" style="font-size: 17px">
+				圈子
+			</div>
+			<div class="hiwall-header-right link-node" ref-href="dynamic_add_win.html">
+				<img src="../image/add-white.png" style="width: 25px;margin-top: 12px">
+			</div>
+		</header>
+		<header id="tab-3" class="hiwall-header hiwall-hidden">
+			<div class="hiwall-header-left">
+				<!--<img src="../image/back-icon.png">-->
+			</div>
+			<div class="hiwall-header-title">
+				我
+			</div>
+			<div class="hiwall-header-right func-node" ref-func='share'>
+				<img src="../image/share.png">
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script>
+		var pageArr = ['HomeTopicSub.html', 'HomeList.html', 'GroupZoneSub.html', 'UserCenterSub.html'];
+		var first = 0;
+		var tabImgPath = 'widget://image/tabBar/simple/';
+		var tabImgName = ['home', 'list', 'group', 'user'];
+		var tabPath = new Array();
+		var tabActivePath = new Array();
+		var tabBarObj = null;
+		// 隐藏所有的一级frame
+		function hideAllFrame() {
+			for (var i = 0; i < pageArr.length; i++) {
+				api.setFrameAttr({
+					name : pageArr[i],
+					hidden : true
+				});
+			}
+		}
+
+		function showframe(page) {
+			api.setFrameAttr({
+				name : page,
+				hidden : false
+			});
+		}
+
+		apiready = function() {
+			if ( typeof onPageInit == "function") {
+				onPageInit();
+			}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			getUnreadPrivteCount();
+			if (api.systemType == 'ios') {
+				var tabEnd = '-ios.png';
+				//ios系统 tabbar的后缀
+				//				pageArr[1] = 'HomeList_IOS.html';
+				$api.fixIos7Bar($api.byId("tab-0"));
+				$api.fixIos7Bar($api.byId("tab-1"));
+				$api.fixIos7Bar($api.byId("tab-2"));
+				$api.fixIos7Bar($api.byId("tab-3"));
+			} else {
+				var tabEnd = '.png';
+			}
+			for (var i = 0; i < tabImgName.length; i++) {
+				tabPath.push(tabImgPath + tabImgName[i] + tabEnd);
+				tabActivePath.push(tabImgPath + tabImgName[i] + '-active' + tabEnd);
+			}
+			$api.byId('school-name').innerText = localStorage.getItem('schoolName');
+			api.addEventListener({
+				name : 'reLogin'
+			}, reConnect);
+			api.addEventListener({
+				name : 'reChooseSchool'
+			}, reInitGroup);
+			api.addEventListener({
+				name : 'getNewMessage'
+			}, function(ret, err) {
+				getUnreadPrivteCount();
+			});
+			api.addEventListener({
+				name : 'getUnreadCount'
+			}, function(ret, err) {
+				showNewMsgTips(ret.value.unreadCount);
+			});
+			var header = $api.dom('header');
+			var header_h = $api.offset(header).h;
+			var body = $api.dom('body');
+			var body_h = $api.offset(body).h;
+			var rect_h = body_h - header_h - 50;
+			tabBarObj = api.require('tabBar');
+			//双击退出
+			api.addEventListener({
+				name : 'keyback'
+			}, function(ret, err) {
+				if (!first) {
+					first = new Date().getTime();
+					api.toast({
+						msg : '再按一次退出',
+						duration : 1500,
+						location : 'bottom'
+					});
+					setTimeout(function() {
+						first = null;
+					}, 1500);
+				} else {
+					if (new Date().getTime() - first < 1500) {
+						api.toLauncher();
+					}
+				}
+			});
+			api.openFrameGroup({
+				name : 'group1',
+				background : '#fff',
+				scrollEnabled : false,
+				rect : {
+					x : 0,
+					y : header_h,
+					w : 'auto',
+					h : rect_h
+				},
+				index : 0,
+				bounces : false,
+				frames : [{
+					bounces : false,
+					name : pageArr[0],
+					url : pageArr[0],
+				}, {
+					bounces : false,
+					name : pageArr[1],
+					url : pageArr[1],
+				}, {
+					bounces : true,
+					name : pageArr[2],
+					url : pageArr[2],
+				}, {
+					bounces : true,
+					name : pageArr[3],
+					url : pageArr[3],
+				}]
+			}, function(ret, err) {
+				var name = ret.name;
+				var index = ret.index;
+			});
+			tabBarObj.open({
+				selecteIndex : 0,
+				bgImg : 'widget://image/tabBar/simple/bg-white.png',
+				selectImg : 'widget://image/tabBar/simple/bg-white.png',
+				items : [{
+					title : '首页',
+					img : tabPath[0],
+					selected : tabActivePath[0],
+					selectedTitleColor : '#3598DC',
+					color : '#A0A0A0'
+				}, {
+					title : '列表',
+					img : tabPath[1],
+					selected : tabActivePath[1],
+					selectedTitleColor : '#3598DC',
+					color : '#A0A0A0'
+				}, {
+					title : '圈子',
+					img : tabPath[2],
+					selected : tabActivePath[2],
+					selectedTitleColor : '#3598DC',
+					color : '#A0A0A0'
+				}, {
+					title : '我',
+					img : tabPath[3],
+					selected : tabActivePath[3],
+					selectedTitleColor : '#3598DC',
+					color : '#A0A0A0'
+				}]
+			}, function(ret, err) {
+				var index = ret.index;
+				for (var i = 0; i < pageArr.length; i++) {
+					$('#tab-' + i).addClass('hiwall-hidden');
+				}
+				$('#tab-' + index).removeClass('hiwall-hidden');
+				if (index != 1) {
+					api.setFrameGroupAttr({
+						name : 'ListGroup',
+						hidden : true
+					});
+					api.setFrameAttr({
+						name : 'FriendsList.html',
+						hidden : true
+					});
+					api.setFrameAttr({
+						name : 'TopicList.html',
+						hidden : true
+					});
+					api.setFrameAttr({
+						name : 'ChatList.html',
+						hidden : true
+					});
+				} else {
+					api.execScript({
+						frameName : pageArr[1],
+						script : 'showFrame();'
+					});
+				}
+				api.setFrameGroupIndex({
+					name : "group1",
+					index : index,
+					scroll : false
+				});
+			});
+			var rong = api.require('rongCloud2');
+			console.log("rong init");
+			rong.init(function(ret, err) {
+			});
+			setConnectListener();
+			//监听新消息
+			receiveMessageListener();
+			reConnect();
+		}
+		function reConnect() {
+			getToken(rongCloudInit);
+		}
+
+		function reInitGroup() {
+			$api.byId('school-name').innerText = localStorage.getItem('schoolName');
+		}
+
+		function share() {
+			var sharedModule = api.require("shareAction");
+			var sharedMsg = {
+				text : "这是要分享的纯文本信息",
+				type : "text"
+			};
+			sharedModule.share(sharedMsg);
+		}
+
+		$(function() {
+			$(".homelist-tab").on('tap', function() {
+				var index = event.srcElement.getAttribute('tabindex');
+				if ($(this).attr('class') == 'homelist-tab') {
+					$('.homelist-tab').removeClass('homelist-tab-active');
+					this.setAttribute('class', 'homelist-tab homelist-tab-active');
+					var initHomeListArr = ['showChatFrame()', 'showFriendsFrame()', 'showTopicFrame()'];
+					api.execScript({
+						frameName : pageArr[1],
+						script : initHomeListArr[index]
+					});
+				} else {
+					api.execScript({
+						frameName : pageArr[1],
+						script : "refreshCurrentFrame()"
+					});
+				}
+			});
+		});
+		function showGroupDrop() {
+			if ($api.byId("group-drop-pointer").getAttribute('class') == 'drop-pointer-open') {
+				api.execScript({
+					frameName : 'HomeTopicSub.html',
+					script : "closeGroupList()"
+				});
+			} else {
+				$api.removeCls($api.byId("group-drop-pointer"), "drop-pointer-close");
+				$api.addCls($api.byId("group-drop-pointer"), "drop-pointer-open");
+				api.execScript({
+					frameName : 'HomeTopicSub.html',
+					script : "showGroupDrop()"
+				});
+			}
+		}
+
+		function closeGroupDrop() {
+			$api.addCls($api.byId("group-drop-pointer"), "drop-pointer-close");
+			$api.removeCls($api.byId("group-drop-pointer"), "drop-pointer-open");
+		}
+
+		function showNewMsgTips(unreadCount) {
+			if (unreadCount == 0||isEmpty(unreadCount)) {
+				hideNewMsgTips();
+			} else {
+				$api.addCls($api.byId("new-msg-mark"), "new-msg-tips");
+//				tabBarObj.setBadge({
+//					index : 1,
+//					badge : unreadCount
+//				});
+			}
+		}
+
+		function hideNewMsgTips() {
+			$api.removeCls($api.byId("new-msg-mark"), "new-msg-tips");
+//			tabBarObj.setBadge({
+//				index : 1,
+//			});
+		}
+	</script>
+</html>

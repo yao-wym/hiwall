@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport"
+		content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body>
+		<header class="header hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div id="choose-title" class="hiwall-header-title">
+				选择地区
+			</div>
+			<div class="hiwall-header-right">
+				&nbsp;
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script>
+
+		var schoolTemp = {};
+		var UICityList = null;
+		var groupType = null;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			console.log($("header").height());
+			console.log($("body").height());
+			groupType = api.pageParam.extraInfo;
+			if(groupType == 1){
+				$api.byId("choose-title").innerText = "选择地区";
+			}else{
+				$api.byId("choose-title").innerText = "选择圈子";
+			}
+			console.log(groupType);
+			getCityList();
+			api.addEventListener({
+				name : 'backToCityList'
+			}, function(ret, err) {
+				initCityList();
+			});
+		}
+		function getCityList() {
+			api.showProgress({
+				style : 'default',
+				animationType : 'fade',
+				title : '',
+				text : '',
+				modal : false
+			});
+			api.ajax({
+				url : GROUPLIST_API+'/'+groupType,
+				method : 'get',
+				timeout : 30,
+				dataType : 'json',
+			}, function(ret, err) {
+				api.hideProgress();
+				//coding...
+				if (ret.state == false) {
+					alert(ret.content.info);
+				} else {
+					var cityArr = new Array();
+					var citys = {
+						'topCitys' : '',
+						'citys' : cityArr
+					};
+					var groupArr = ret.content.group_cate;
+					if(isEmpty(groupArr))return;
+					for (var i = 0; i < groupArr.length; i++) {
+						var city = {
+							'id' : '',
+							'city' : '',
+							'pinyin' : 'a'
+						};
+						city['id'] = groupArr[i].id;
+						city['city'] = groupArr[i].title;
+						citys['citys'].push(city);
+						if (groupArr[i].child_cate != null) {
+							var schoolArr = new Array();
+							var schools = {
+								'topCitys' : '',
+								'citys' : schoolArr
+							};
+							for (var j = 0; j < groupArr[i].child_cate.length; j++) {
+								var school = {
+									'id' : '',
+									'city' : '',
+									'pinyin' : 'a'
+								};
+								school['id'] = groupArr[i].child_cate[j].id;
+								school['city'] = groupArr[i].child_cate[j].title;
+								schools['citys'].push(school);
+							}
+							schoolTemp[groupArr[i].id] = schools;
+						}
+					}
+					console.log(JSON.stringify(citys));
+					api.writeFile({
+						path : 'fs://CityList.json',
+						data : JSON.stringify(citys)
+					}, function(ret, err) {
+						var status = ret.status;
+						if (status) {
+							initCityList();
+						} else {
+							api.alert({
+								msg : err.msg
+							});
+						}
+					});
+				}
+			});
+		}
+
+		function initCityList() {
+			UICityList = api.require('UICityList');
+			UICityList.open({
+				rect : {
+					x : 0,
+					y : $("header").height(),
+					w : $("body").width(),
+					h : $("body").height()
+				},
+				resource : 'fs://CityList.json',
+				styles : {
+					searchBar : {
+						bgColor : '#C9C9C9',
+						cancelColor : '#E3E3E3'
+					},
+					location : {
+						color : '#696969',
+						size : 12
+					},
+					sectionTitle : {
+						bgColor : '#eee',
+						color : '#000',
+						size : 12
+					},
+					item : {
+						bgColor : '#fff',
+						activeBgColor : '#eee',
+						color : '#000',
+						size : 14,
+						height : 40
+					},
+					indicator : {
+						bgColor : '#fff',
+						color : '#3598DC'
+					}
+				},
+				//          currentCity: '北京',
+				//          locationWay: 'GPS',
+				//  hotTitle: '热门城市',
+				placeholder : '搜索'
+			}, function(ret, err) {
+				if (ret.eventType == 'selected') {
+					console.log(JSON.stringify(ret.cityInfo));
+					console.log(JSON.stringify(schoolTemp[ret.cityInfo.id]));
+					localStorage.setItem('cityId', ret.cityInfo.id);
+					localStorage.setItem('cityName', ret.cityInfo.city);
+					api.writeFile({
+						path : 'fs://SchoolList.json',
+						data : JSON.stringify(schoolTemp[ret.cityInfo.id])
+					}, function(ret, err) {
+						var status = ret.status;
+						if (status) {
+							redirectView('SchoolChoose.html', {'groupType':groupType}, true);
+						} else {
+							api.alert({
+								msg : err.msg
+							});
+						}
+					});
+				}
+			});
+		}
+	</script>
+</html>

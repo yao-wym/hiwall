@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body class="hiwall-bg-gray" style="height:100%">
+		<header id="hiwall-header" class="header hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div id="user-name" class="hiwall-header-title">
+			</div>
+			<div id="friendsCenter" class="hiwall-header-right">
+				<img src="../image/friend_add.png">
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<!--<script type="text/javascript" src="../script/chat.js"></script>-->
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			console.log(JSON.stringify(api.pageParam));
+			var targetId = api.pageParam.friendsId;
+			var friendsInfo = $api.getStorage(targetId);
+			if(isEmpty(friendsInfo)){
+				loadFriendsInfo(targetId,function(user){
+					document.getElementById('user-name').innerText = user.nickname;
+				});
+			}else{
+				document.getElementById('user-name').innerText = friendsInfo.nickname;
+			}
+			openSubFrame('ChatRoomSub.html');
+			$('#friendsCenter').click(function(){
+				redirectView('FriendsCenter.html',{'uid':friendsInfo.uid});
+			});
+		}
+	</script>
+</html>

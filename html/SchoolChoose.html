@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>选择学校</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body>
+		<header class="header hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="returnCityList">
+				<img src="../image/back-icon.png">
+			</div>
+			<div class="hiwall-header-title" id="choose-title">
+				添加群组
+			</div>
+			<div class="hiwall-header-right" style="padding-right: 4px">
+				<button class="link-node" ref-href='index.html' style="border: solid 1px white;border-radius: 5px;color: white;margin-top: 11px;padding: 6px 7px;font-size: 12px">
+					取消
+				</button>
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script>
+		var groupType = null;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			var obj = api.require('UICityList');
+			groupType = api.pageParam.groupType;
+			if(groupType == 1){
+				$api.byId("choose-title").innerText = "添加学校";
+			}else{
+				$api.byId("choose-title").innerText = "添加群组";
+			}
+			console.log($("header").height());
+			console.log($("body").height());
+			obj.open({
+				rect : {
+					x : 0,
+					y : $("header").height(),
+					w : $("body").width(),
+					h : $("body").height()
+				},
+				resource : 'fs://SchoolList.json',
+				styles : {
+					searchBar : {
+						bgColor : '#C9C9C9',
+						cancelColor : '#E3E3E3'
+					},
+					location : {
+						color : '#696969',
+						size : 12
+					},
+					sectionTitle : {
+						bgColor : '#eee',
+						color : '#000',
+						size : 12
+					},
+					item : {
+						bgColor : '#fff',
+						activeBgColor : '#eee',
+						color : '#000',
+						size : 14,
+						height : 40
+					},
+					indicator : {
+						bgColor : '#fff',
+						color : '#3598DC'
+					}
+				},
+				//  currentCity: '北京',
+				//  locationWay: 'GPS',
+				//  hotTitle: '热门城市',
+				placeholder : '搜索'
+			}, function(ret, err) {
+				if (ret.eventType == 'selected') {
+					joinGroup(ret.cityInfo.id, ret.cityInfo.city);
+				}
+			});
+		}
+		function returnCityList() {
+			api.sendEvent({
+				name : 'backToCityList',
+				extra : {
+				}
+			});
+			api.closeWin();
+		}
+
+		function joinGroup(groupId, groupName) {
+			showProgress('加入圈子中');
+			postJsonAjax(USER_JOIN_GROUP_API, {
+				'uid' : localStorage.getItem('uid'),
+				'groupcate_id' : groupId
+			}, function(ret) {
+				console.log(JSON.stringify(ret.cityInfo));
+				//					localStorage.setItem('schoolId', groupId);
+				//					localStorage.setItem('schoolName', groupName);
+				redirectView('UserGroup.html', '', true);
+				//					api.sendEvent({
+				//						name : 'reChooseSchool',
+				//						extra : {
+				//						}
+				//					});
+				
+				//joinSchool(ret.cityInfo)
+			});
+		}
+	</script>
+</html>

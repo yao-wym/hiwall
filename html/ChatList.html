@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>选择地区</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+		<link rel="stylesheet" type="text/css" href="../css/search.css" />
+	</head>
+	<body class="hiwall-bg-grey"></body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script src="../script/zepto.min.js"></script>
+	<script>
+		var UIlistObj = null;
+		var friendsArr = new Array();
+		var friendsListStatus = false;
+		var conversationStatus = false;
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			console.log('当前用户id' + localStorage.getItem('uid'));
+			api.addEventListener({
+				name : 'online'
+			}, function(ret, err) {
+				var connectionType = ret.connectionType;
+				//获取链接类型
+				netConnected();
+			});
+			api.addEventListener({
+				name : 'reLogin'
+			}, clearPage);
+			api.addEventListener({
+				name : 'rongConnected'
+			}, initConversation);
+			api.addEventListener({
+				name : 'clearUnreadStatus'
+			}, refreshPage);
+			api.addEventListener({
+				name : 'getConversationList'
+			}, function(ret, err) {
+				console.log("获取到会话列表：更新会话列表" + JSON.stringify(ret));
+				getConversationListCB(ret.value.msgList.result)
+			});
+			api.addEventListener({
+				name : 'getNewMessagePrivate'
+			}, function(ret, err) {
+				console.log("列表更新：收到新消息" + JSON.stringify(ret.value.data));
+				getNewMsg(ret.value.data)
+			});
+			api.addEventListener({
+				name : 'refreshList'
+			}, function(ret, err) {
+				console.log("列表更新：用户发消息" + JSON.stringify(ret));
+				refreshPage();
+			});
+			UIlistObj = api.require('UIListView');
+			getChatList();
+		}
+		function netConnected() {
+			console.log('网络重新链接');
+			//			if (friendsListStatus == false) {
+			//				postJsonAjax(FRIENDS_LIST_API, {
+			//					"uid" : localStorage.getItem('uid')
+			//				}, getfriendsListCB)
+			//			}
+		}
+
+		function reloadPage() {
+			console.log('reload');
+			UIlistObj.reloadData({
+				data : friendsArr
+			}, function(ret) {
+				if (ret.status) {
+					console.log('刷新数据消除bug');
+				}
+			});
+		}
+
+		function clearPage() {
+			UIlistObj.close();
+		}
+
+		function getConversationListCB(conversationList) {
+			for (var i = 0; i < conversationList.length; i++) {
+				console.log('i=' + i + '$$' + conversationList[i].conversationType)
+				if (conversationList[i].conversationType == 'PRIVATE') {
+					var conversation = {};
+					conversation['rightBtns'] = [{
+						bgColor : '#ef6060',
+						activeBgColor : '',
+						width : 70,
+						title : '删除',
+						titleSize : 15,
+						titleColor : '#fff',
+						icon : '',
+						iconWidth : 20
+					}];
+					//朋友id为senderUserId或者targetId
+					console.log('消息字段' + conversationList[i].latestMessage.extra);
+					conversation['uid'] = conversationList[i].senderUserId == localStorage.getItem('uid') ? conversationList[i].targetId : conversationList[i].senderUserId;
+					if (!isEmpty($api.getStorage(conversation['uid']))) {
+						var friendsInfo = $api.getStorage(conversation['uid']);
+						console.log('保存的用户信息' + JSON.stringify(friendsInfo));
+						conversation['imgPath'] = HOST + '/' + friendsInfo.avatar128;
+						conversation['title'] = friendsInfo.nickname;
+					} else if (!isEmpty(conversationList[i].latestMessage.extra)) {
+						loadFriendsInfo(conversation['uid']);
+						var friendsInfo = JSON.parse(conversationList[i].latestMessage.extra);
+						if (friendsInfo.nickname != localStorage.getItem('nickname')) {
+							conversation['imgPath'] = friendsInfo.imgPath;
+							conversation['title'] = friendsInfo.nickname;
+						} else {
+							conversation['imgPath'] = 'widget://image/user-icon.png';
+							conversation['title'] = '匿名用户';
+						}
+					} else {
+						loadFriendsInfo(conversation['uid']);
+						conversation['imgPath'] = 'widget://image/user-icon.png';
+						conversation['title'] = '匿名用户';
+					}
+					console.log('用户头像' + conversation['imgPath']);
+					conversation['subTitle'] = conversationList[i].latestMessage.text;
+					if(conversationList[i].unreadMessageCount != 0){
+						conversation['remark'] = conversationList[i].unreadMessageCount;
+					}
+					if (conversationList[i].receivedStatus == 0) {// 采用按位掩码，1：已读，2：已收听，4：已下载
+						conversation['remark'] = conversationList[i].unreadMessageCount;
+					}
+					friendsArr.push(conversation);
+				}else if(conversationList[i].conversationType=='GROUP'){
+					
+				}
+			}
+			console.log("插入消息" + i + JSON.stringify(conversation));
+			UIlistObj.open({
+				rect : {
+					x : 0,
+					y : 0,
+					h : api.frameHeight,
+					w : api.frameWidth
+				},
+				data : friendsArr,
+				rightBtns : [{
+					bgColor : '#ef6060',
+					activeBgColor : '',
+					width : 70,
+					title : '删除',
+					titleSize : 15,
+					titleColor : '#fff',
+					icon : '',
+					iconWidth : 20
+				}],
+				styles : {
+					borderColor : '#CCCCCC',
+					item : {
+						bgColor : '#efefef',
+						activeBgColor : '#F5F5F5',
+						height : 70.0,
+						imgWidth : 55,
+						imgHeight : 55,
+						placeholderImg : '',
+						titleSize : 18.0,
+						titleColor : '#000',
+						subTitleSize : 13.0,
+						subTitleColor : '#a0a0a0',
+						remarkColor : '#a0a0a0',
+						remarkSize : 16,
+						remarkIconWidth : 30
+					}
+				},
+				fixedOn : api.frameName
+			}, function(ret) {
+				//朋友列表加载完成
+				var clickCB = function(ret, eventType) {
+					if (eventType == "clickRemark") {
+						console.log(JSON.stringify(ret.data));
+						redirectView('ChatRoom.html', {
+							'friendsId' : ret.data.uid
+						});
+					} else if (eventType == "clickContent") {
+						console.log(JSON.stringify(ret.data));
+						redirectView('ChatRoom.html', {
+							'friendsId' : ret.data.uid
+						});
+					} else if (eventType == "clickImg") {
+						redirectView('FriendsCenter.html', {
+							'uid' : ret.data.uid
+						});
+					} else if (eventType == "clickRightBtn") {
+						delConversation(ret.data.uid, delItem);
+					}
+				}
+				onListviewClick(UIlistObj, ret, clickCB);
+			});
+		}
+
+		function getNewMsg(newMsg) {
+			refreshPage();
+		}
+
+		function initConversation() {
+			if (conversationStatus == false) {
+				console.log('融云连接成功，列表重新初始化');
+				conversationStatus = true;
+				getConversationList();
+			}
+		}
+
+		function getChatList() {
+			var rong = api.require('rongCloud2');
+			rong.getConnectionStatus(function(ret, err) {
+				console.log(JSON.stringify(ret));
+				if (ret.result.connectionStatus == 'CONNECTED' && conversationStatus == false) {
+					conversationStatus = true;
+					getConversationList();
+				}
+			})
+		}
+
+		function delItem(friendsId) {
+			for (var i = 0; i < friendsArr.length; i++) {
+				if (friendsArr[i]['uid'] == friendsId) {
+					console.log('删除第' + i + '条成功user-id=' + JSON.stringify(friendsArr[i]));
+					friendsArr.splice(i, 1);
+					UIlistObj.deleteItem({
+						index : i
+					}, function(ret) {
+						if (ret.status) {
+							console.log('删除成功');
+						}
+					});
+				}
+			}
+		}
+
+		function refreshPage() {
+			friendsArr = new Array();
+			conversationStatus = false;
+			UIlistObj.close();
+			getChatList();
+		}
+
+		function delConversation(friendsId, delItem) {
+			delItem(friendsId);
+			removePrivateConversation(friendsId);
+		}
+	</script>
+</html>

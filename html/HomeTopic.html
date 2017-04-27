@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body class="hiwall-bg-white">
+		<header class="hiwall-header">
+			<div class="hiwall-header-left">
+				<!--<img src="../image/back-icon.png">-->
+			</div>
+			<div id="school-name" class="hiwall-header-title link-node" reload='true' ref-href="CityChoose.html" style="font-size: 17px">
+				请点击选择学校
+			</div>
+			<div class="hiwall-header-right link-node" ref-href="CreateTopic.html">
+				<img src="../image/add-white.png">
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			document.getElementById('school-name').innerText = localStorage.getItem('schoolName');
+			openSubFrame('HomeTopicSub.html');
+		};
+	</script>
+</html>

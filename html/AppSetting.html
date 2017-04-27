@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>设置</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.swicher-close {
+				width: 40px;
+				background-size: 100%;
+				border: none;
+				background-repeat: no-repeat;
+				background-image: url('../image/close.png');
+			}
+			.swicher-open {
+				width: 40px;
+				background-size: 100%;
+				border: none;
+				background-repeat: no-repeat;
+				background-image: url('../image/open.png');
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<header class="hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div class="hiwall-header-title">
+				设置
+			</div>
+			<div class="hiwall-header-right">
+				&nbsp;
+			</div>
+		</header>
+		<section style="padding-top: 30px">
+			<div class="hiwall-label-white">
+				<span>声音</span>
+				<span onclick='swichVoice()' id="voice-swicher" style="float: right ;height:25px;margin-right: 10px;margin-top: 8px"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>震动</span>
+				<span onclick='swichVibration()' id="vibration-swicher" style="float: right ;height:25px;margin-right: 10px;margin-top: 8px"></span>
+			</div>
+			<!--<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+			<span>字体</span>
+			<span class="hiwall-con-deepgray hiwall-label-right" style="float: right;margin-right: 10px">中</span>
+			</div>-->
+			<div class="hiwall-dividing-gray"></div>
+			<div ref-func="clearCache" class="func-node hiwall-label-white">
+				<span>清除缓存</span>
+				<span id="cache-size" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white func-node" ref-func="loginOut">
+				<span>退出</span>
+			</div>
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript">
+		var vibrationSwicher = document.getElementById('vibration-swicher');
+		var voiceSwicher = document.getElementById('voice-swicher');
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			var vibrationState = $api.getStorage('vibrationState');
+			var voiceState = $api.getStorage('voiceState');
+			getCacheSize();
+			if (isEmpty(vibrationState)) {
+				vibrationState = 1;
+				$api.setStorage('vibrationState', vibrationState);
+			}
+			if (isEmpty(voiceState)) {
+				voiceState = 1;
+				$api.setStorage('voiceState', voiceState);
+			}
+			
+			voiceSwicher.setAttribute('class', voiceState == 0 ? "swicher-close" : "swicher-open")
+			vibrationSwicher.setAttribute('class', vibrationState == 0 ? "swicher-close" : "swicher-open")
+		};
+		function getCacheSize(){
+			api.getCacheSize(function(ret, err) {
+				var size = ret.size;
+				if(size>1000000){
+					var sizeText = size/1000000+'M';
+				}else if(size>1000){
+					var sizeText = size/1000+'KB';
+				}else{
+					var sizeText = size+'B';
+				}
+				$api.byId("cache-size").innerText = sizeText;
+			});
+		}
+		function loginOut() {
+			var rong = api.require('rongCloud2');
+			rong.disconnect(false);
+			localStorage.setItem('uid', "");
+			localStorage.setItem('token', "");
+			localStorage.setItem('password', "");
+			localStorage.setItem('connected', 0);
+			localStorage.setItem('nickname', "");
+			localStorage.setItem('sex', "");
+			localStorage.setItem('signature', "");
+			localStorage.setItem('email', "");
+			localStorage.setItem('usericon', "");
+			localStorage.setItem('schoolId', "");
+			localStorage.setItem('schoolName', "");
+			redirectView('Login.html');
+		}
+
+		function swichVibration() {
+			src = event.srcElement;
+			src.setAttribute('class', src.getAttribute('class') == 'swicher-close' ? 'swicher-open' : 'swicher-close');
+			$api.setStorage('vibrationState', src.getAttribute('class') == 'swicher-close' ? 0 : 1);
+		}
+
+		function swichVoice() {
+			src = event.srcElement;
+			src.setAttribute('class', src.getAttribute('class') == 'swicher-close' ? 'swicher-open' : 'swicher-close');
+			$api.setStorage('voiceState', src.getAttribute('class') == 'swicher-close' ? 0 : 1);
+		}
+
+		function clearCache() {
+			api.clearCache();
+			getCacheSize();
+			api.toast({
+				msg : '清除成功',
+				duration : 2000,
+				location : 'bottom'
+			});
+			getCacheSize();
+			//$api.rmStorage('showGuide');
+		}
+	</script>
+</html>

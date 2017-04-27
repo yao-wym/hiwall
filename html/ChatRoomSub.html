@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<style>
+			body {
+				padding: 0;
+				margin: 0;
+				background-repeat: no-repeat;
+				background-attachment: fixed;
+			}
+			::-webkit-scrollbar {
+				width: 0px;
+				display: none;
+			}
+			::-webkit-scrollbar-track {
+				border-radius: 0px;
+				background-color: rgba(25, 147, 147, 0);
+				display: none;
+			}
+			::-webkit-scrollbar-thumb {
+				border-radius: 0px;
+				background-color: rgba(25, 147, 147, 0);
+				display: none;
+			}
+			.chat-thread {
+				margin: 24px auto 0 auto;
+				padding: 0 10px 10px 0;
+				list-style: none;
+				overflow-y: scroll;
+				overflow-x: hidden;
+			}
+			.chat-thread li {
+				position: relative;
+				clear: both;
+				display: inline-block;
+				padding: 16px 40px 16px 20px;
+				margin: 0 0 20px 0;
+				font: 16px/20px 'Noto Sans', sans-serif;
+				border-radius: 10px;
+				word-break: break-all;
+				background-color: #3598DC;
+				font-size: 16px;
+				font-family: 'Microsoft Yahei', '微软雅黑';
+			}
+			/* Chat - Avatar */
+			.chat-thread li:before {
+				position: absolute;
+				top: 0;
+				width: 50px;
+				height: 50px;
+				border-radius: 50px;
+				content: '';
+			}
+			/* Chat - Speech Bubble Arrow */
+			.chat-thread li.chat-user:after {
+				position: absolute;
+				top: 15px;
+				content: '';
+				width: 0;
+				height: 0;
+				border-top: 15px solid #3598DC;
+			}
+			.chat-thread li.chat-friend:after {
+				position: absolute;
+				top: 15px;
+				content: '';
+				width: 0;
+				height: 0;
+				border-top: 15px solid #fff;
+			}
+			.chat-thread li.chat-friend {
+				/*animation: show-chat-odd 0.15s 1 ease-in;
+				 -moz-animation: show-chat-odd 0.15s 1 ease-in;
+				 -webkit-animation: show-chat-odd 0.15s 1 ease-in;*/
+				float: right;
+				margin-right: 80px;
+				color: #000;
+				background-color: #fff;
+			}
+			.chat-thread li.chat-friend:after {
+				border-right: 15px solid transparent;
+				right: -15px;
+			}
+			.chat-thread li.chat-user {
+				/*animation: show-chat-even 0.15s 1 ease-in;
+				 -moz-animation: show-chat-even 0.15s 1 ease-in;
+				 -webkit-animation: show-chat-even 0.15s 1 ease-in;*/
+				float: left;
+				margin-left: 80px;
+				color: #000;
+			}
+			.chat-thread li.chat-user:after {
+				border-left: 15px solid transparent;
+				left: -15px;
+			}
+			/* Small screens */
+			@media all and (max-width: 767px) {
+				.chat-thread {
+					width: 90%;
+					height: 260px;
+				}
+				.chat-window {
+					left: 5%;
+					width: 90%;
+				}
+			}
+			/* Medium and large screens */
+			@media all and (min-width: 768px) {
+				.chat-thread {
+					width: 50%;
+					height: 320px;
+				}
+				.chat-window {
+					left: 25%;
+					width: 50%;
+				}
+			}
+			@keyframes show-chat-even {
+			0% {
+			margin-left: -480px;
+			}
+			100% {
+			margin-left: 0;
+			}
+			}
+			@-moz-keyframes show-chat-even {
+			0% {
+			margin-left: -480px;
+			}
+			100% {
+			margin-left: 0;
+			}
+			}
+			@-webkit-keyframes show-chat-even {
+			0% {
+			margin-left: -480px;
+			}
+			100% {
+			margin-left: 0;
+			}
+			}
+			@keyframes show-chat-odd {
+			0% {
+			margin-right: -480px;
+			}
+			100% {
+			margin-right: 0;
+			}
+			}
+			@-moz-keyframes show-chat-odd {
+			0% {
+			margin-right: -480px;
+			}
+			100% {
+			margin-right: 0;
+			}
+			}
+			@-webkit-keyframes show-chat-odd {
+			0% {
+			margin-right: -480px;
+			}
+			100% {
+			margin-right: 0;
+			}
+			}
+			.credits a {
+				text-decoration: none;
+				color: rgba(255, 255, 255, 0.35);
+			}
+			.chat-thread li.chat-user-img-item, .chat-thread li.chat-friends-img-item {
+				padding: 10px
+			}
+			.msg-user-icon {
+				border-radius: 50%;
+			}
+		</style>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<div id="template" style="display:none">
+		<li class="chat-friends-item chat-user">
+			<img class="msg-user-icon" src="../image/user-icon.png" style="position:absolute;left:-80px;top:0px;width:50px;height:50px">
+			<span class="msg-text"></span>
+		</li>
+		<li class="chat-user-item chat-friend">
+			<img class="msg-user-icon" src="../image/user-icon.png" style="position:absolute;right:-80px;top:0px;width:50px;height:50px">
+			<span class="msg-text"></span>
+		</li>
+		<li class="chat-user chat-user-img-item">
+			<img class="msg-user-icon" src="../image/user-icon.png" style="position:absolute;left:-80px;top:0px;width:50px;height:50px">
+			<span style="max-width:200px"> <img class="chat-item-img" style="max-width:100%" src="../image/user-bg.png"/></span>
+		</li>
+		<li class="chat-friend chat-friends-img-item">
+			<img class="msg-user-icon" src="../image/user-icon.png" style="position:absolute;right:-80px;top:0px;width:50px;height:50px">
+			<span style="max-width:200px"> <img class="chat-item-img" style="max-width:100%" src="../image/user-bg.png"/></span>
+		</li>
+		<li class="time-divide" style="background-color:transparent;display:block;width:100%;color: #000;text-align: center;padding-bottom: 10px;font-size: 12px"></li>
+	</div>
+	<body class="hiwall-bg-gray">
+		<div id="convo" class="hiwall-bg-gray">
+			<ul id="chat-container" class="chat-thread" style="width:92%;height:100%;padding-bottom:50px;padding-top:10px;margin-top:0"></ul>
+		</div>
+		<div style="text-align:center;clear:both"></div>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript" src="../script/chat.js"></script>
+	<script type="text/javascript">
+		var chatContainerEle = document.getElementById('chat-container');
+		var friendsItem = document.querySelector("#template .chat-friends-item");
+		var userItem = document.querySelector("#template .chat-user-item");
+		var friendsImgItem = document.querySelector("#template .chat-friends-img-item");
+		var userImgItem = document.querySelector("#template .chat-user-img-item");
+		var timeDivide = document.querySelector("#template .time-divide");
+		var chatItem = null;
+		var oldestMessageId
+		var friends = {};
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			api.setRefreshHeaderInfo({
+				visible : true,
+				loadingImg : 'widget://image/ptr_pull.png',
+				bgColor : '#efeff4',
+				textColor : '#959595',
+				textDown : '加载更多',
+				textUp : '松开加载',
+				textLoading : '加载中',
+				showTime : false
+			}, function(ret, err) {
+				getHistoryPrivateMsg(friends.uid, loadHistoryMsg);
+				//				getNewData();
+				//				api.refreshHeaderLoadDone();
+			});
+			var friendsId = api.pageParam.friendsId;
+			friends = $api.getStorage(friendsId);
+			clearMsgUnreadStatus(friendsId);
+			getImgsPaths(sourcePath, function(emotion) {
+				emotionData = emotion;
+			});
+			api.addEventListener({
+				name : 'getNewMessagePrivate'
+			}, function(ret, err) {
+				console.log("刷新消息" + JSON.stringify(ret.value.data));
+				if (ret.value.data.targetId == friends.uid && ret.value.data.objectName == 'RC:TxtMsg') {
+					addMsgToContainer(friends.uid, ret.value.data.content.text);
+				} else if (ret.value.data.targetId == friends.uid && ret.value.data.objectName == 'RC:ImgMsg') {
+					addImgToContainer(friends.uid, ret.value.data.content.imageUrl);
+				}
+			});
+			console.log('当前聊天对象id' + friends.uid);
+			getLatestPrivateMsg(friends.uid, initChatRoom);
+			initChatBox();
+			$('body').on('tap', '.chat-item-img', imageBrowser);
+			$('body').on('tap', '.msg-user-icon', friendsSenterShow);
+		};
+		function imageBrowser(src) {
+			imgPath = event.srcElement.getAttribute('src');
+			photosArr = new Array();
+			photosArr.push(imgPath.replace(/_100_auto/, ''));
+			var obj = api.require('imageBrowser');
+			obj.openImages({
+				imageUrls : photosArr,
+				showList : false,
+				activeIndex : 0
+			});
+		}
+		function friendsSenterShow() {
+			uid = event.srcElement.getAttribute('uid');
+			redirectView('FriendsCenter.html', {
+				'uid' : uid
+			});
+		}
+
+		function loadHistoryMsg(msgList) {
+			for (var i = 0; i < msgList.length; i++) {
+				if (msgList[i].objectName == 'RC:TxtMsg') {
+					loadMsgToContainer(msgList[i].senderUserId, msgList[i].content.text);
+				} else if (msgList[i].objectName == 'RC:ImgMsg') {
+					loadImgToContainer(msgList[i].senderUserId, msgList[i].content.imageUrl);
+				}
+			}
+			timeDivide.innerText = getLocalTime(msgList[msgList.length - 1].receivedTime);
+			chatContainerEle.insertBefore(timeDivide.cloneNode(true), chatContainerEle.firstElementChild);
+		}
+
+		function initChatRoom(msgList) {
+			if (isEmpty(msgList)) {
+				return;
+			}
+			for (var i = 0; i < msgList.length; i++) {
+				if (msgList[i].objectName == 'RC:TxtMsg') {
+					addMsgToContainer(msgList[i].senderUserId, msgList[i].content.text);
+				} else if (msgList[i].objectName == 'RC:ImgMsg') {
+					addImgToContainer(msgList[i].senderUserId, msgList[i].content.imageUrl);
+				}
+			}
+			timeDivide.innerText = getLocalTime(msgList[msgList.length - 1].receivedTime);
+			chatContainerEle.insertBefore(timeDivide.cloneNode(true), chatContainerEle.firstElementChild);
+		}
+
+		function addMsgToContainer(targetId, message) {
+			if (targetId == localStorage.getItem('uid')) {
+				chatItem = userItem;
+			} else {
+				chatItem = friendsItem;
+			}
+			var item = chatItem.cloneNode(true);
+			var friendsInfo = getFriendsInfo(targetId);
+			item.querySelector(".msg-text").innerHTML = transText(message);
+			item.querySelector(".msg-user-icon").setAttribute('uid', targetId);
+			item.querySelector(".msg-user-icon").setAttribute('src', friendsInfo.imgPath);
+			chatContainerEle.appendChild(item);
+			item.scrollIntoView();
+		}
+
+		function loadMsgToContainer(targetId, message) {
+			if (targetId == localStorage.getItem('uid')) {
+				chatItem = userItem;
+			} else {
+				chatItem = friendsItem;
+			}
+			var item = chatItem.cloneNode(true);
+			var friendsInfo = getFriendsInfo(targetId);
+			console.log('加载的更多消息：' + message);
+			item.querySelector(".msg-text").innerHTML = transText(message);
+			item.querySelector(".msg-user-icon").src = friendsInfo.imgPath;
+			item.querySelector(".msg-user-icon").setAttribute('uid', targetId);
+			chatContainerEle.insertBefore(item, chatContainerEle.firstElementChild);
+		}
+
+		function addImgToContainer(targetId, imgPath) {
+			if (targetId == localStorage.getItem('uid')) {
+				chatItem = friendsImgItem;
+			} else {
+				chatItem = userImgItem;
+			}
+			var item = chatItem.cloneNode(true);
+			var friendsInfo = getFriendsInfo(targetId);
+			item.querySelector(".chat-item-img").setAttribute('src', imgPath);
+			item.querySelector(".msg-user-icon").setAttribute('uid', targetId);
+			item.querySelector(".msg-user-icon").src = friendsInfo.imgPath;
+			chatContainerEle.appendChild(item);
+			item.scrollIntoView();
+			return item;
+		}
+
+		function loadImgToContainer(targetId, imgPath) {
+			if (targetId == localStorage.getItem('uid')) {
+				chatItem = friendsImgItem;
+			} else {
+				chatItem = userImgItem;
+			}
+			var item = chatItem.cloneNode(true);
+			var friendsInfo = getFriendsInfo(targetId);
+			item.querySelector(".chat-item-img").setAttribute('src', imgPath);
+			item.querySelector(".msg-user-icon").setAttribute('uid', targetId);
+			item.querySelector(".msg-user-icon").src = friendsInfo.imgPath;
+			chatContainerEle.insertBefore(item, chatContainerEle.firstElementChild);
+			return item;
+		}
+
+		function initChatBox() {
+			var UIChatBox = api.require('UIChatBox');
+			UIChatBox.open({
+				placeholder : '',
+				maxRows : 4,
+				emotionPath : 'widget://image/emotion',
+				texts : {
+					recordBtn : {
+						normalTitle : '按住 说话',
+						activeTitle : '松开 结束'
+					}
+				},
+				styles : {
+					inputBar : {
+						borderColor : '#d9d9d9',
+						bgColor : '#f2f2f2'
+					},
+					inputBox : {
+						borderColor : '#B3B3B3',
+						bgColor : '#FFFFFF'
+					},
+					emotionBtn : {
+						normalImg : 'widget://image/face1.png'
+					},
+					extrasBtn : {
+						normalImg : 'widget://image/add1.png'
+					},
+					keyboardBtn : {
+						normalImg : 'widget://image/key1.png'
+					},
+					//      speechBtn: {
+					//          normalImg: 'widget://image/add1.png'
+					//      },
+					recordBtn : {
+						normalBg : '#c4c4c4',
+						activeBg : '#999999',
+						color : '#000',
+						size : 14
+					},
+					indicator : {
+						target : 'both',
+						color : '#c4c4c4',
+						activeColor : '#9e9e9e'
+					}
+				},
+				extras : {
+					titleSize : 10,
+					titleColor : '#a3a3a3',
+					btns : [{
+						title : '图片',
+						normalImg : 'widget://image/album1.png',
+						activeImg : 'widget://image/album2.png'
+					}, {
+						title : '拍照',
+						normalImg : 'widget://image/cam1.png',
+						activeImg : 'widget://image/cam2.png'
+					}]
+				}
+			}, function(ret) {
+				//点击附加功能面板
+				if (ret.eventType == 'clickExtras') {
+					console.log("用户点击了第" + ret.index + "个按钮");
+					if (ret.index == 1) {
+						api.getPicture({
+							sourceType : 'camera',
+							encodingType : 'jpg',
+							mediaValue : 'pic',
+							destinationType : 'url',
+							allowEdit : false,
+							quality : 50,
+							targetWidth : 640,
+							saveToPhotoAlbum : true
+						}, function(ret, err) {
+							if (!isEmpty(ret.data)) {
+								console.log(JSON.stringify(ret));
+								var temp = addImgToContainer(localStorage.getItem('uid'), ret.data);
+								sendPrivateImgMsg(friends.uid, ret.data, changeImgStatus);
+							}
+						});
+					} else if (ret.index == 0) {
+						api.getPicture({
+							sourceType : 'album',
+							encodingType : 'jpg',
+							mediaValue : 'pic',
+							destinationType : 'url',
+							allowEdit : true,
+							quality : 50,
+//							targetWidth : 100,
+//							targetHeight : 100,
+							saveToPhotoAlbum : false
+						}, function(ret, err) {
+							if (!isEmpty(ret.data)) {
+								console.log(JSON.stringify(ret));
+								var temp = addImgToContainer(localStorage.getItem('uid'), ret.data);
+								sendPrivateImgMsg(friends.uid, ret.data, changeImgStatus);
+							} else {
+								//								api.alert({
+								//									msg : err.msg
+								//								});
+							}
+						});
+					}
+				}
+				//点击发送按钮
+				if (ret.eventType == 'send') {
+					sendPrivateTextMsg(friends.uid, ret.msg, sendMsgCB);
+				}
+			});
+		}
+
+		function sendMsgCB(targetId, imgPath) {
+			api.sendEvent({
+				name : 'refreshList',
+				extra : {
+					key : 'true',
+				}
+			});
+			addMsgToContainer(targetId, imgPath);
+		}
+
+		function sendImgCB(targetId, imgPath) {
+			api.sendEvent({
+				name : 'refreshList',
+				extra : {
+					key : 'true',
+				}
+			});
+			addImgToContainer(targetId, imgPath);
+		}
+
+		function changeImgStatus() {
+		}
+	</script>
+</html>

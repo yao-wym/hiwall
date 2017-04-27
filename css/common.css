@@ -1,0 +1,97 @@
+html,body{
+	height: 100%;
+	width:100%;
+	font-family:'Microsoft Yahei', '微软雅黑';
+}
+#wrap{
+    height: 100%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-flex-flow: column;
+           flex-flow: column;
+}
+#header{
+    text-align: center; background-color: #81a9c3; color: #fff;
+    width: 100%;
+}
+#header h1{
+    font-size: 20px; height: 44px; line-height: 44px; margin: 0em; color: #fff;
+}
+#main{
+    -webkit-box-flex: 1; 
+    -webkit-flex: 1;
+    flex: 1;
+    padding: 2em;
+}
+#footer{
+    height: 30px; line-height: 30px;
+    background-color: #81a9c3; 
+    width: 100%;
+    text-align: center;
+}
+#footer h5{
+    color: white;
+}
+.con{font-size: 28px; text-align: center;}
+
+.hiwall-bg-blue{
+	background-color:#3598DC
+}
+.hiwall-bg-deep-blue{
+	background-color:#03528D
+}
+.hiwall-bg-gray{
+	background-color:#EEEEEE
+}
+.hiwall-bg-grey{
+	background-color:#E2E2E2
+}
+.hiwall-bg-white{
+	background-color:#FFFFFF
+}
+.hiwall-dividing-gray{
+	background-color:#CCCCCC;
+	color:#CCCCCC;
+	height:1px;
+	width: 100%
+}
+.hiwall-ver-dividing-blue{
+	background-color:#3598DC;
+	color:#3598DC;
+	width:1px;
+	height: 100%;
+	display:inline-block
+}
+.hiwall-ver-dividing-gray{
+    background-color:#CCCCCC;
+    color:#3598DC;
+    width:1px;
+    height: 100%;
+    display:inline-block
+}
+.hiwall-con-blue{
+	color:#3598DC
+}
+.hiwall-con-deep-blue{
+	color:#03528D
+}
+.hiwall-con-white{
+	color:#FFFFFF
+}
+.hiwall-con-gray{
+    color:#EEEEEE
+}
+.hiwall-hidden{
+    display:none
+}
+.hiwall-con-deepgray{
+     color:#919191
+ }
+.hiwall-border-deep-blue{
+	border:solid 1px #03528D 
+}
+.hiwall-border-blue{
+	border:solid 1px #3598DC
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <link rel="stylesheet" type="text/css" href="../css/dynamic_show.css" />
+</head>
+<body>
+	<div id="wrap">
+		<div class="aui-content" id="dynamic-content"></div>
+	   </div>
+	<script id="dynamicShow-template" type="text/x-dot-template">
+	<div class="aui-list-view dynamic-list">
+		<div class="aui-col-xs-12 aui-padded-10" tapmode onclick="spaceShow({{=it.uid}});">
+			<div class="dynamic-user-avatar">
+				<img src="../image/noavatar.gif" {{? it.user.avatar64}}data-echo="{{=HOST+'/'+it.user.avatar64}}"{{? }}>
+			</div>
+			<div class="dynamic-user-info">
+				{{? it.inputtime==0}}
+					<div class="aui-pull-right synchro-loading">
+						<span><img src="../image/synchro.gif"></span>
+						<span>同步中</span>
+					</div>
+				{{??}}
+				<div class="aui-pull-right dynamic-time">{{=getLocalTime(it.create_time*1000)}}</div>
+				{{? }}
+				<div class="dynamic-user-nickname">
+					<span>{{=it.user.nickname}}</span>
+				</div>
+			</div>
+		</div>
+		<div class="aui-line-x aui-clearfix"></div>
+		<div class="aui-col-xs-12 aui-padded-10 dynamic-content">{{=replace_em(it.detail)}}</div>
+		{{? it.logo!=0}}
+		<ul class="aui-thumb-view">
+		    <li class="aui-list-view-cell aui-img aui-col-xs-12" tapmode onclick="imageBrowser();">
+		                <img class="aui-img-object" src="../image/nophoto.png" data-echo="{{=it.logo}}">
+		          </li> 
+        </ul>
+        {{? }}
+    </div>
+    </script>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/common.js"></script>
+<script type="text/javascript" src="../script/doT.min.js"></script>
+<script type="text/javascript" src="../script/echo.js"></script>
+<script>
+	var topicImg = null;
+	apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+		getTopicInfo();
+	}
+	function getTopicInfo(){
+		getJsonAjax(TOPIC_DETAIL_API,{'id':api.pageParam.topicId},function(topic){
+		topicImg = topic.logo;
+		var content = $api.byId('dynamic-content');
+		var tpl = $api.byId('dynamicShow-template').text;
+		var tempFn = doT.template(tpl);
+		$api.html(content, tempFn(topic));
+		echo.init({
+			offset : 100,
+			throttle : 250,
+			callback : function(element, op) {
+			}
+		});
+		api.hideProgress();
+		api.parseTapmode();
+		})
+	}
+	function imageBrowser() {
+	var obj = api.require('imageBrowser');
+	var photoArr = new Array();
+	photoArr[0] = topicImg;
+	obj.openImages({
+		imageUrls : photoArr,
+		showList : false,
+		activeIndex : 0
+	});
+}
+</script>
+</html>

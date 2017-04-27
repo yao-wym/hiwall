@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title></title>
+
+		<style type="text/css">
+			div.pinch-zoom,
+			div.pinch-zoom img {
+				width: 100%;
+				-webkit-user-drag: none;
+			}
+		</style>
+		<!--<link rel="stylesheet" href="style.css" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+
+		<!-- pinchzoom requires: jquery and underscore -->
+		<script type="text/javascript" src="../../js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="../../js/underscore.js"></script>
+		<script type="text/javascript" src="../../js/pinchzoom.js"></script>
+		<script type="text/javascript" src="../../js/mui.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				$('div.pinch-zoom').each(function() {
+					new RTP.PinchZoom($(this), {});
+				});
+				//          document.body.scrollHeight= "400px"
+				$("body").css('height',window.clientHeight);
+				$("#pinch-zoom").css('height',window.clientHeight);
+			$('#img').load(function() {
+					if(document.documentElement.clientHeight-$('#img').height()>0){
+					$("#img").css('top',(document.documentElement.clientHeight-$('#img').height())/2);
+				}
+					// 加载完成    
+				}); 
+			})
+		</script>
+	</head>
+
+	<body style="background-color: black;">
+
+		<div class="page mui-content" style="height: 600px;">
+			<div class="pinch-zoom" id="pinch-zoom" style="height: 600px;" >
+				<img  id="img" style="position: relative;" src="http://123.57.44.143/PublicHome/image/slide/slide1-bg.jpg"/>
+		</div>
+		</div>
+
+	</body>
+	<script>
+		var shares = null,
+			bhref = false;
+		var goodsId = null;
+		var cartGoodsNum = document.getElementById('cart-goods-num');
+		mui.init();
+		mui.plusReady(function() {
+			var self = plus.webview.currentWebview();
+			imgSrc = self.extraData;
+			document.getElementById('img').src = imgSrc;
+		});
+		window.addEventListener("init_page", function(e) {
+			imgSrc = e.detail.extraData;
+			document.getElementById('img').src = imgSrc;
+			
+		});
+		document.body.addEventListener('click', function() {
+			plus.webview.currentWebview().opener().show("slide-in-left", 300);
+		})
+		mui.back();
+	</script>
+
+</html>

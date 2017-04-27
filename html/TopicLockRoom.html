@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.topic-password {
+				width: 13%;
+				font-size: 18px;
+				border-right: solid 1px #D5D8DB;
+				height: 40px;
+				background-color: white;
+			}
+			.topic-password:last-child {
+				border: none;
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<header class="" style="height: 40px;text-align: center;background-color: #2D3E50;color: white;">
+			<div class="hiwall-header-title" style="font-size: 17px;margin-top: -2px">
+				请输入密码
+			</div>
+		</header>
+		<section style="text-align: center;padding-top: 50px">
+			<div style="font-size: 18px">
+				你所选的话题已经被加密
+			</div>
+			<div style="border: solid 1px #D5D8DB;border-radius: 5px;width: 84%;margin: 30px auto;background-color: white">
+				<!--<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>
+				<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>
+				<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>
+				<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>
+				<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>
+				<input pattern="[0-9]{1,1}" type="password" class="topic-password"/>-->
+				<input placeholder="请输入房间密码" type="number" style="width:100%;line-height:20px;height:20px;padding-top:10px;padding-bottom:10px;font-size:20px" id="input-key"/>
+			</div>
+			<button class="hiwall-button-blue func-node" ref-func='checkPwd' style="width: 90%;margin-top: 20px;background-color: #2D3E50">
+				确定
+			</button>
+			<button  class="hiwall-button-border-blue func-node" ref-func='goBack' style="color: #2D3E50;width: 90%;margin-top: 15px;border-color: #2D3E50">
+				取消
+			</button>
+		</section>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+		};
+		function checkPwd() {
+			if ($api.byId('input-key').value == api.pageParam.secretKey) {
+				joinTopic(api.pageParam.topicId, api.pageParam.topicName)
+			} else {
+				api.toast({
+					msg : '密码错误'
+				});
+			}
+		}
+
+		function joinTopic(topicId, topicName) {
+			showProgress('加入中...');
+			api.ajax({
+				url : GROUP_JOIN_API,
+				method : 'post',
+				timeout : 30,
+				dataType : 'json',
+				data : {
+					values : {
+						"uid" : localStorage.getItem('uid'),
+						"group_id" : topicId
+					}
+				}
+			}, function(ret, err) {
+				api.hideProgress();
+				api.sendEvent({
+					name : 'joinTopic',
+				});
+				rongJoinGroup(topicId, topicName);
+			});
+		}
+	</script>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>添加学校</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<header class="hiwall-header">
+			<div class="hiwall-header-left func-node" style="width:90px;text-align:left;padding-left:10px" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div class="hiwall-header-title">
+				邀请加入
+			</div>
+			<div class="hiwall-header-right" style="padding-right: 4px;width:100px;text-align:right">
+				<button class="func-node" ref-func="cancelInvite" style="border: solid 1px white;border-radius: 5px;color: white;margin-top: 11px;padding: 6px 7px;font-size: 12px">
+					跳过
+				</button>
+				<button class="func-node" ref-func="inviteFriends" style="border: solid 1px white;border-radius: 5px;color: white;margin-top: 11px;padding: 6px 7px;font-size: 12px">
+					邀请
+				</button>
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript">
+		var uncheckedUrl = 'widget://image/unchecked.png';
+		var checkedUrl = 'widget://image/checked.png';
+		var iconUrl = null;
+		var UIListView = null;
+		var topicId = null;
+		var friendsArr = new Array();
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			UIListView = api.require('UIListView');
+			topicId = api.pageParam.topicId;
+			refreshPage();
+		}
+		function getfriendsListCB(friendsList) {
+			console.log('好友列表：'+JSON.stringify(friendsList));
+			if(isEmpty(friendsList)){
+				return;
+			}
+			for (var i = 0; i < friendsList.length; i++) {
+				if(isEmpty(friendsList[i].user)){
+					continue;
+				}
+				var friends = {};
+				console.log(JSON.stringify(friendsList[i]));
+				friends['uid'] = friendsList[i].user.uid;
+				friends['imgPath'] = HOST + "/" + friendsList[i].user.avatar128;
+				friends['title'] = friendsList[i].user.nickname;
+				friends['icon'] = uncheckedUrl;
+				friendsArr.push(friends);
+			}
+			initFriendsList(friendsArr);
+		}
+
+		function refreshPage() {
+			UIListView.close();
+			postJsonAjax(FRIENDS_LIST_API, {
+				"uid" : localStorage.getItem('uid')
+			}, getfriendsListCB)
+		}
+		function cancelInvite(){
+			redirectView('index.html');
+		}
+		function initFriendsList(friendsArr) {
+			UIListView.open({
+				rect : {
+					x : 0,
+					y : 65,
+					h : api.frameHeight
+				},
+				data : friendsArr,
+				styles : {
+					borderColor : '#CCCCCC',
+					item : {
+						bgColor : '#efefef',
+						activeBgColor : '#F5F5F5',
+						height : 70.0,
+						imgWidth : 55,
+						imgHeight : 55,
+						placeholderImg : '',
+						titleSize : 18.0,
+						titleColor : '#000',
+						subTitleSize : 13.0,
+						subTitleColor : '#a0a0a0',
+						remarkColor : '#a0a0a0',
+						remarkSize : 16,
+						remarkIconWidth : 30
+					}
+				},
+				fixedOn : api.frameName
+			}, function(ret) {
+				var clickCB = function(ret, eventType,index) {
+					var friendsId = ret.data.uid;
+					if (eventType == "clickRemark") {
+						if (friendsArr[index].icon == uncheckedUrl) {
+							iconUrl = checkedUrl;
+						} else {
+							iconUrl = uncheckedUrl;
+						}
+						UIListView.updateItem({
+							index : index,
+							data : {
+								uid : friendsArr[index].uid,
+								title : friendsArr[index].title,
+								imgPath : friendsArr[index].imgPath,
+								icon : iconUrl
+							}
+						}, function(ret) {
+							if (ret.status) {
+								friendsArr[index].icon = iconUrl;
+							}
+						});
+					} 
+				}
+				onListviewClick(UIListView, ret, clickCB);
+			});
+		}
+		function inviteFriends(){
+			var isChoose = false
+			for(var i=0;i<friendsArr.length;i++){
+				if(friendsArr[i].icon == checkedUrl){
+					var isChoose = true;
+					break;
+				}
+			}
+			if(isChoose==false){
+				api.toast({
+	                msg:'你还没有选择邀请的好友噢'
+                });
+                return;
+			}
+			showProgress('发送邀请中...');
+			for(var i=0;i<friendsArr.length;i++){
+				if(friendsArr[i].icon == checkedUrl){
+					var inviteTip = localStorage.getItem('nickname')+'邀请你加入话题"'+api.pageParam.topicName+'"';
+					sendPrivateTextMsg(friendsArr[i].uid,inviteTip,function(ret){
+					});
+				}
+			}
+			api.hideProgress();
+			redirectView('index.html');
+		}
+	</script>
+</html>

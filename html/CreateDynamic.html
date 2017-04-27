@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<header class="hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div class="hiwall-header-title" id="school-name" style="font-size: 17px">
+				发表动态
+			</div>
+			<div class="hiwall-header-right">
+				&nbsp;
+			</div>
+		</header>
+		<section class="hiwall-bg-gray" style="margin-top: 10px;position: relative">
+			<!--<input id="title" style="margin: 5px;font-size: 16px;width: 80%" placeholder="输入话题题目(20字)："/>
+			<div class="hiwall-dividing-gray" style="margin-right: 20px"></div>-->
+			<textarea id="content" style="margin: 5px;font-size: 16px;width: 90%;height: 350px" placeholder="你现在想说的..."></textarea>
+		</section>
+		<footer style="position: fixed;bottom: 50px;height: 35px;width: 100%;padding-top: 10px">
+			<div style="display: inline-block;width: 45%;">
+				<input id="logo" style="margin-left: 20px;font-size: 12px;height: 30px;background-color: white;border-radius: 13px;width: 120px" placeholder="输入链接">
+			</div>
+			<div style="float: right;margin-right: 15px">
+				<img src="../image/switch.png" style="width: 45px;margin-top: 2px"/>
+				<span class="hiwall-con-blue" style="position: relative;top:-7px;margin-left: 5px">我的位置</span>
+			</div>
+		</footer>
+		<footer style="position: fixed;bottom: 0;background-color: white;height: 35px;width: 100%;padding-top: 10px">
+			<div style="display: inline-block;width: 23%;text-align: center">
+				<img src="../image/camera.png" style="width: 25px;" class="func-node" ref-func="selectImage"/>
+			</div>
+			<div style="display: inline-block;width: 23%;text-align: center">
+				<img src="../image/face.png" style="width: 25px;"/>
+			</div>
+			<div style="display: inline-block;width: 23%;text-align: center">
+				<img src="../image/topic-lock.png" style="width: 25px;"/>
+			</div>
+			<div ref-func="topicCreate" style="height: 100%;display: inline-block;position:relative;top:-5px;font-size: 17px;left: 25px;text-align: center;" class="hiwall-con-blue func-node">
+				发表
+			</div>
+		</footer>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+		};
+		function topicCreate() {
+			var content = document.getElementById('content').value;
+			showProgress('发表中...');
+			postJsonAjax(DYNAMIC_CREATE_API, {
+				"uid" : localStorage.getItem('uid'),
+				"content" : content
+			}, function(msg) {
+				api.toast({
+					msg : msg
+				});
+				goBack();
+			});
+		}
+
+		function uploadImage() {
+			postJsonFileAjax(DYNAMIC_IMG_API, {
+			}, function(msg) {
+				api.toast({
+					msg : msg
+				});
+				goBack();
+			});
+		}
+
+		function selectImage() {
+			api.actionSheet({
+				title : '请选择图片来源',
+				cancelTitle : '取消',
+				buttons : ['相册选取', '魅力自拍']
+			}, function(ret, err) {
+				var winWidth = api.winWidth;
+				var listHeight = winWidth / 3 - 12;
+				if (ret.buttonIndex == 1) {
+					//ALBUM
+					var album = api.require('UIMediaScanner');
+					album.open({
+						column : 4,
+						sort : {
+							key : 'time',
+							order : 'desc'
+						},
+						texts : {
+							stateText : '*',
+							cancelText : '取消',
+							finishText : '完成'
+						},
+						styles : {
+							bg : '#fff',
+							mark : {
+								icon : '',
+								position : 'bottom_left',
+								size : 20
+							},
+							nav : {
+								bg : '#1abc9c',
+								stateColor : '#ffffff',
+								stateSize : 18,
+								cancleBg : 'rgba(0,0,0,0)',
+								cancelColor : '#ffffff',
+								cancelSize : 18,
+								finishBg : 'rgba(0,0,0,0)',
+								finishColor : '#ffffff',
+								finishSize : 18
+							}
+						}
+					}, function(ret) {
+						if (ret) {
+							//alert(JSON.stringify(ret));
+							var photoList = $api.byId("photoList");
+							var photos = ret.list;
+							var list = ret.list;
+							api.toast({
+								msg : '正在加载图片',
+								duration : 1000,
+								location : 'top'
+							});
+							for (var i in list) {
+								var item = list[i];
+								var imgDom = $api.dom('.image-list[img-src="' + item.path + '"]');
+								if (!imgDom) {
+									$api.prepend(photoList, '<li class="aui-col-xs-4 aui-list-view-cell aui-img image-list" style="height:' + listHeight + 'px;" data-src="' + item.path + '"><img class="aui-img-object uploadPhotos" src="' + item.thumbPath + '" /><div class="uploading" id="' + item.path + '">上传中</div><span class="imgdelete aui-iconfont aui-icon-delete" tapmode onclick="deleteImage(\'' + item.path + '\')"></span></span></li>');
+									api.parseTapmode();
+									uploadImage(item.path);
+								}
+							}
+						}
+					});
+				} else if (ret.buttonIndex == 2) {
+					//TAKE A PHOTO
+					api.getPicture({
+						sourceType : 'camera',
+						encodingType : 'jpg',
+						mediaValue : 'pic',
+						destinationType : 'url',
+						allowEdit : false,
+						quality : 60,
+						targetWidth : 640,
+						saveToPhotoAlbum : true
+					}, function(ret, err) {
+						var photoList = $api.byId("photoList");
+						if (ret.data) {
+							$api.prepend(photoList, '<li class="aui-col-xs-4 aui-list-view-cell aui-img image-list" style="height:' + listHeight + 'px;" data-src="' + ret.data + '"><img class="aui-img-object uploadPhotos" src="' + ret.data + '"><div class="uploading" id="' + ret.data + '">上传中</div><span class="imgdelete aui-iconfont aui-icon-delete" tapmode onclick="deleteImage(\'' + ret.data + '\')"></span></span></li>');
+							api.parseTapmode();
+							uploadImage(ret.data);
+						}
+					});
+				}
+			});
+		}
+	</script>
+</html>

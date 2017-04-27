@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+    <style>
+    	body{
+    	}
+        .hiwall-edit-input{
+            background-color: white;
+            height: 40px;
+            color: #EEEEEE;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .setting-icon{
+            width: 20px;
+            position: relative;
+            top:5px
+        }
+        .next-img{
+            width: 10px;
+            margin-right: 5px;
+            position: relative;
+            top: 3px;
+        }
+        .hiwall-label-white{
+            height: 50px;
+            line-height: 50px;
+        }
+        .label-title{
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body class="hiwall-bg-gray">
+	<header class="hiwall-header">
+        <div class="hiwall-header-left func-node" ref-func='goBack'>
+            <img src="../image/back-icon.png">
+        </div>
+        <div class="hiwall-header-title">用户资料</div>
+        <div class="hiwall-header-right">
+            <!--<img src="../image/friend_add.png">-->
+        </div>
+	</header>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/rongyun.js"></script>
+<script type="text/javascript">
+	apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+	    openSubFrame('FriendsCenterSub.html');
+	};
+	function friendsAdd(){
+		addFriends(api.pageParam.uid);
+	}
+</script>
+</html>

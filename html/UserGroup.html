@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择群组</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+    <style>
+        body{
+        }
+    </style>
+</head>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<body class="hiwall-bg-gray">
+<header class="hiwall-header">
+     <div class="hiwall-header-left func-node" ref-func="goBack"> 
+         <img src="../image/back-icon.png">
+     </div>
+    <div class="hiwall-header-title">选择群组</div>
+    <div class="hiwall-header-right" style="padding-right: 4px">
+        <button onclick="groupSelected()" style="border: solid 1px white;border-radius: 5px;color: white;margin-top: 11px;padding: 6px 7px;font-size: 12px">确定</button>
+    </div>
+</header>
+</body>
+<script type="text/javascript">
+    apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+		openSubFrame('UserGroupSub.html');
+    };
+    function groupSelected(){
+    	if(!isEmpty(localStorage.getItem('schoolId'))){
+    		redirectView('index.html');
+    	}else{
+    		api.toast({
+	            msg:'请先选择一个圈子哦'
+            });
+    	}
+    }
+</script>
+</html>

@@ -1,0 +1,159 @@
+body {
+    background-color: #efeff4;
+}
+.aui-content {
+    padding: 10px 0 0 0;
+    overflow: hidden;
+}
+#header {
+    background-color: #1abc9c;
+}
+
+/*动态发布*/
+.weekday {
+    width: 100%;
+    display: none;
+}
+.weekday img {
+    width: 100%;
+    display: block;
+}
+.dynamic-add label {
+    padding-top: 13px;
+    font-size: 14px;
+}
+.dynamic-add .textarea {
+    padding: 10px;
+}
+.dynamic-add .aui-pull-right, .dynamic-add .aui-pull-left {
+    padding-top: 10px;
+    padding-right: 10px;
+    color: #8f8f94;
+    font-size: 12px;
+}
+.dynamic-add .aui-pull-right.aui-iconfont {
+    font-size: 16px;
+}
+.dynamic-add textarea {
+    font-size: 14px;
+    padding: 5px;
+    border: none;
+}
+.dynamic-add .aui-input-row:last-child:after {
+    height: 0;
+}
+
+.dynamic-add .type-list {
+    padding: 10px;
+    position: relative;
+}
+.dynamic-add .type-list:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 1px;
+    content: '';
+    background-color: #c8c7cc;
+    -webkit-transform: scaleY(.5);
+    transform: scaleY(.5);
+}
+.dynamic-add .type-list .aui-label {
+    padding: 10px 14px;
+    font-size: 14px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+.dynamic-add .type-list .aui-label.active {
+    background-color: #1ABC9C;
+    color: #ffffff;
+    -webkit-animation: fade .7s ease both;
+    animation: fade .7s ease both;
+}
+.dynamic-add-input {
+    border: none;
+}
+.dynamic-add-thumb {
+    width: 96px;
+    height: 128px;
+    line-height: 128px;
+    border: 1px dashed #BDC3C7;
+    color: #8f8f94;
+    font-size: 14px;
+    margin-left: 10px;
+    float: left;
+    position: relative;
+    text-align: center;
+}
+.dynamic-add-right {
+    width: 100%;
+    padding-left: 116px;
+    margin-left: -106px;
+    float: left;
+}
+
+.dynamic-add-right .aui-input-row {
+    padding: 0;
+}
+.dynamic-add-right .aui-input-row:last-child:after {
+    height: 0;
+    -webkit-transform: scaleY(0);
+          transform: scaleY(0);
+}
+.dynamic-add-right label {
+    padding-left: 0;
+    padding-top: 12px;
+    width: 50px;
+    font-size: 14px;
+}
+.dynamic-add-right label ~ input {
+    padding: 5px 0;
+    color: #8f8f94;
+    font-size: 14px;
+}
+.aui-list-view-cell.aui-img {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+img.aui-img-object {
+    width: 100%;
+    height: 100%;
+}
+.image-list {
+    position: relative;
+}
+
+.image-list .uploading {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 30px;
+    line-height: 30px;
+    width: 100%;
+    font-size: 14px;
+    color: #ffffff;
+    text-align: center;
+    background:rgba(0, 0, 0, 0.5) none repeat scroll 0 0 !important;
+}
+.image-list .imgdelete {
+    width: 26px;
+    height: 26px;
+    line-height: 26px;
+    display: block;
+    position: absolute;
+    right: 2px;
+    bottom: 0;
+    color: #ffffff;
+    text-align: center;
+    background:rgba(0, 0, 0, 0.5) none repeat scroll 0 0 !important;
+}
+@-webkit-keyframes fade {
+    from { opacity: 0.3; }
+    to {  }
+}
+@keyframes fade {
+    from { opacity: 0.3; }
+    to {  }
+}

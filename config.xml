@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<widget id="A6997492463926" version="0.0.2"> 
+  <name>hiwall</name>  
+  <description>嗨墙</description>  
+  <author email="774177563@qq.com" href="http://www.apicloud.com">xiaotao23</author>  
+  <content src="html/Login.html"/>  
+  <preference name="pageBounce" value="false"/>  
+  <preference name="appBackground" value="mrgba(0,0,0,0.0)"/>  
+  <preference name="windowBackground" value="rgba(0,0,0,0.0)"/>  
+  <preference name="frameBackgroundColor" value="rgba(0,0,0,0.0)"/>  
+  <preference name="hScrollBarEnabled" value="false"/>  
+  <preference name="vScrollBarEnabled" value="true"/>  
+  <preference name="autoLaunch" value="true"/>  
+  <preference name="fullScreen" value="false"/>  
+  <preference name="autoUpdate" value="true"/>  
+  <preference name="smartUpdate" value="true"/>  
+  <preference name="debug" value="false"/>  
+  <preference name="statusBarAppearance" value="true"/>  
+  <preference name="iOS7StatusBarAppearance" value="true"/>  
+  <permission name="readPhoneState"/>  
+  <permission name="camera"/>  
+  <permission name="record"/>  
+  <permission name="location"/>  
+  <permission name="fileSystem"/>  
+  <permission name="internet"/>  
+  <permission name="bootCompleted"/>  
+  <permission name="hardware"/>  
+  <access origin="*"/>  
+  <feature name="UICityList"/>  
+  <feature name="UIChatBox"/>  
+  <feature name="UISearchBar"/>  
+  <feature name="sideMenu"/>  
+  <feature name="imageBrowser"/>  
+  <feature name="UIListView"/>  
+  <feature name="inputField"/>  
+  <feature name="searchBar"/>  
+  <feature name="fs"/>  
+  <feature name="UIMediaScanner"/>  
+  <feature name="tabBar"/>  
+  <feature name="navigationBar"/>  
+  <feature name="cameraTool"/>  
+  <feature name="rongCloud2"> 
+    <param name="appKey" value="e0x9wycfxnxqq"/> 
+  </feature>  
+  <feature name="qq"> 
+    <param name="urlScheme" value="tencent1104877695"/>  
+    <param name="apiKey" value="1104877695"/> 
+  </feature>  
+  <feature name="shareAction"/>  
+  <feature name="weibo"> 
+    <param name="urlScheme" value="wb3730755905"/>  
+    <param name="apiKey" value="3730755905"/>  
+    <param name="registUrl" value="http://www.apicloud.com"/> 
+  </feature>  
+  <feature name="listContact"/>  
+  <feature name="wx"> 
+    <param name="urlScheme" value="wx17f63705c709be35"/>  
+    <param name="apiKey" value="wx17f63705c709be35"/>  
+    <param name="apiSecret" value="d4624c36b6795d1d99dcf0547af5443d"/> 
+  </feature>  
+  <feature name="mobVerify"/>  
+  <feature name="UIScrollPicture"/> 
+</widget>

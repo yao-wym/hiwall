@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.topic-item, .topic-item-lock {
+				background-color: #EEEEEE;
+				border-radius: 5px;
+				height: 45px;
+				font-size: 12px;
+				width: 48%;
+				padding-top: 5px;
+				position: relative;
+				margin: 7px 0.5% 0 0.5%;
+				display: inline-block;
+			}
+			.topic-item .topic-icon, .topic-item-lock .topic-icon {
+				width: 40px;
+				height: 40px;
+				border-radius: 25px;
+				margin-left: 5px;
+			}
+			.topic-item .topic-lock-tips, .topic-item-lock .topic-lock-tips {
+				position: absolute;
+				bottom: 3px;
+				right: 5px;
+				width: 6px;
+				height: 10px
+			}
+			.topic-item .topic-title, .topic-item-lock .topic-title {
+				/*margin-top: 10px;*/
+				margin-left: 5px;
+				position: relative;
+				top: -15px;
+				width: 60%;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			#group-drop-list {
+				overflow: scroll;
+				position: fixed;
+				top: 0px;
+				left: 50%;
+				width: 180px;
+				margin-left: -90px;
+				background-color: #0E0E0E;
+				opacity: 0.8;
+				color: white;
+				z-index: 100;
+				max-height: 360px;
+				padding-top: 5px;
+			}
+			.group-drop-list-item {
+				z-index: 101;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				line-height: 28px;
+				font-size: 17px;
+				text-align: center;
+			}
+			.top-topic-item {
+				background-color: #fefef2;
+			}
+			#group-drop-mask {
+				width: 100%;
+				position: fixed;
+				top: 0;
+				background-color: #e1e1e1;
+				opacity: 0.2;
+				z-index: 99;
+			}
+		</style>
+	</head>
+	<script id="group-template" type="text/x-dot-template">
+		<ul id="group-drop-list" class="hiwall-hidden">
+		<li style="color:#efefef;text-align:center;background-color:#000;opacity:1;height:22px;line-height:22px">
+		职业圈
+		</li>
+		<hr style="border:#fff dashed 1px;position:relative;"></hr>
+		<!--<hr style="border:1px dashed #e1e1e1;position:relative;width:100%;top:-13px" />-->
+		{{ for(var i in it) { }}
+		{{? !isEmpty(it[i])&&it[i].groupcate_class==2 }}
+		<li group-id={{=it[i].groupcate_id}}  class="group-drop-list-item">
+		{{=it[i].groupcate_name}}
+		</li>
+		{{?}}
+		{{ } }}
+		<li style="color:#efefef;text-align:center;background-color:#000;opacity:1;height:22px;line-height:22px">学校圈</li>
+		<hr style="border:#fff dashed 1px;position:relative;"></hr>
+		{{ for(var i in it) { }}
+		{{? !isEmpty(it[i])&&it[i].groupcate_class==1 }}
+		<li group-id={{=it[i].groupcate_id}} class="group-drop-list-item">
+		{{=it[i].groupcate_name}}
+		</li>
+		{{?}}
+		{{ } }}
+		</ul>
+	</script>
+	<script id="topic-template" type="text/x-dot-template">
+		{{ for(var i in it) { }}
+			{{? !isEmpty(it[i])}}
+			<div class="topic-item" tapmode onclick="enterGroup('{{=it[i].id}}','{{=it[i].title}}','{{=it[i].detail}}','{{=it[i].member_alias}}')">
+				<img class="topic-icon"{{? isEmpty(it[i].owner.avatar64)}}src="../image/topic_logo_default.png"{{?? !isEmpty(it[i].owner.avatar64)}}src={{=HOST+'/'+it[i].owner.avatar64}}{{?}}>
+				<span class="topic-title">{{=it[i].title}}</span>
+				{{? !isEmpty(it[i].member_alias)}}<img style="size:100%;height:15px;width:13px;position:absolute;right:10px;bottom:5px" class="topic-icon" src="../image/topic-lock-tips.png">{{?}}
+			</div>
+			{{?}}
+		{{}}}
+	</script>
+	<script id="top-topic-template" type="text/x-dot-template">
+		{{ for(var i in it) { }}
+			{{? !isEmpty(it[i])}}
+			<div class="topic-item top-topic-item" tapmode onclick="enterGroup('{{=it[i].id}}','{{=it[i].title}}','{{=it[i].detail}}','{{=it[i].member_alias}}')">
+				<img class="topic-icon"{{? isEmpty(it[i].owner.avatar64)}}src="../image/topic_logo_default.png"{{?? !isEmpty(it[i].owner.avatar64)}}src={{=HOST+'/'+it[i].owner.avatar64}}{{?}}>
+				<span class="topic-title">{{=it[i].title}}</span>
+				{{? !isEmpty(it[i].member_alias)}}<img style="size:100%;height:15px;width:13px;position:absolute;right:10px;bottom:5px" class="topic-icon" src="../image/topic-lock-tips.png">{{?}}
+			</div>
+			{{?}}
+		{{}}}
+	</script>
+	<body class="hiwall-bg-white" id="body-content">
+		<div id="topic-template" style="display: none">
+			<div class="topic-item" tapmode onclick="enterGroup()" group-id="">
+				<img class="topic-icon" src="../image/user-topic_logo_default.png">
+				<span class="topic-title"></span>
+			</div>
+			<div class="topic-item-lock" tapmode onclick="enterGroup()" group-id="">
+				<img class="topic-icon" src="../image/topic_logo_default.png">
+				<span class="topic-title"></span>
+				<img style="size:100%;height:15px;width:13px;position:absolute;right:10px;bottom:5px" class="topic-icon" src="../image/topic-lock-tips.png">
+			</div>
+		</div>
+		<section id="topic-list-container" class="hiwall-bg-white" style="position: relative;padding: 10px 1%">
+		
+		</section>
+		<div id="group-drop-mask"  class="hiwall-hidden"></div>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/doT.min.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script type="text/javascript" src="../script/echo.js"></script>
+	<script type="text/javascript">
+		var topicListContainer = document.getElementById('topic-list-container');
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			$api.byId('group-drop-mask').setAttribute('style', 'height:' + api.frameHeight + 'px');
+			console.log($api.byId('group-drop-mask').outerHTML);
+			api.setRefreshHeaderInfo({
+				visible : true,
+				loadingImg : 'widget://image/ptr_pull.png',
+				bgColor : '#efeff4',
+				textColor : '#959595',
+				textDown : '刷新话题',
+				textUp : '松开刷新',
+				textLoading : '刷新中',
+				showTime : false
+			}, function(ret, err) {
+				refreshTopicList();
+				getGroupDrop();
+			});
+			showProgress();
+			getTopicList();
+			getGroupDrop();
+			api.addEventListener({
+				name : 'reLogin'
+			}, initTopicList);
+			api.addEventListener({
+				name : 'reChooseSchool'
+			}, initTopicList);
+			api.addEventListener({
+				name : 'addTopic'
+			}, initTopicList);
+		};
+		function initTopicList() {
+			console.log('rechooseGroup');
+			//			document.getElementById('school-name').innerText = localStorage.getItem('schoolName');
+			showProgress();
+			getTopicList();
+		}
+
+		function refreshTopicList() {
+			getTopicList();
+		}
+
+		function changeGroup() {
+			var groupId = event.srcElement.getAttribute('group-id');
+			var groupName = event.srcElement.innerText;
+			localStorage.setItem('schoolId', groupId);
+			localStorage.setItem('schoolName', groupName);
+			$api.addCls($api.byId('group-drop-list'), 'hiwall-hidden');
+			$api.addCls($api.byId('group-drop-mask'), 'hiwall-hidden');
+			api.sendEvent({
+				name : 'reChooseSchool',
+				extra : {
+				}
+			});
+		}
+
+		function getTopTopicList() {
+			getJsonAjax(TOPIC_TOP_LIST_API, '', function(groupList) {
+				console.log('top' + JSON.stringify(groupList));
+				initTopTopicListTpl(groupList);
+//				var topicItemTpl = document.querySelector("#topic-template .topic-item").cloneNode(true);
+//				var topicItemLockTpl = document.querySelector("#topic-template .topic-item-lock").cloneNode(true);
+//				for (var i = 0; i < groupList.length; i++) {
+//					if (isEmpty(groupList[i].member_alias)) {
+//						var topicItemEle = topicItemTpl.cloneNode(true);
+//					} else {
+//						var topicItemEle = topicItemLockTpl.cloneNode(true);
+//					}
+//					$api.addCls(topicItemEle, "top-topic-item");
+//					topicItemEle.querySelector('.topic-title').innerText = groupList[i].title;
+//					if (!isEmpty(groupList[i].logo) && groupList[i].logo != "0") {
+//						topicItemEle.querySelector('.topic-icon').src = groupList[i].logo;
+//					}
+//					topicItemEle.onclick = enterGroup(groupList[i].id,groupList[i].title,groupList[i].detail,groupList[i].member_alias);
+//					topicListContainer.insertBefore(topicItemEle, topicListContainer.firstElementChild);
+//				}
+			});
+		}
+
+		function getTopicList() {
+			//			showProgress();
+			api.ajax({
+				url : TOPIC_LIST_API + "/" + localStorage.getItem('schoolId'),
+				method : 'get',
+				timeout : 30,
+				dataType : 'json',
+			}, function(ret, err) {
+				api.hideProgress();
+				api.refreshHeaderLoadDone();
+				topicListContainer.innerHTML = '';
+				getTopTopicList();
+				if (isEmpty(ret)) {
+					return;
+				}
+				//      	alert(JSON.stringify(ret));
+				//coding...
+				if (ret.state == false || isEmpty(ret.content) || isEmpty(ret.content.group_list)) {
+					api.confirm({
+						title : '该学校暂时没有新话题',
+						msg : '现在就去新建一个话题',
+						buttons : ['现在就去', '取消']
+					}, function(ret, err) {
+						if (ret.buttonIndex == 1) {
+							redirectView('CreateTopic.html');
+						}
+					});
+				} else {
+					//      		document.getElementById('school-name').innerText = ret.content.group_list[0].type;
+					var topicList = ret.content.group_list;
+					initTopicListTpl(topicList);
+//					topicListContainer.innerHTML = '';
+//					var topicItemTpl = document.querySelector("#topic-template .topic-item");
+//					var topicItemLockTpl = document.querySelector("#topic-template .topic-item-lock");
+//					//					alert(topicItemLockTpl);
+//					for (var i = 0; i < groupList.length; i++) {
+//						if (isEmpty(groupList[i].member_alias)) {
+//							var topicItemEle = topicItemTpl.cloneNode(true);
+//						} else {
+//							var topicItemEle = topicItemLockTpl.cloneNode(true);
+//						}
+//						topicItemEle.querySelector('.topic-title').innerText = groupList[i].title;
+//						if (!isEmpty(groupList[i].owner.avatar64)) {
+//							topicItemEle.querySelector('.topic-icon').src = HOST + '/' + groupList[i].owner.avatar64;
+//						}
+//						topicItemEle.setAttribute('group-id', groupList[i].id);
+//						topicItemEle.setAttribute('group-name', groupList[i].title);
+//						topicItemEle.setAttribute('group-tips', groupList[i].detail);
+//						topicItemEle.setAttribute('secret-key', groupList[i].member_alias);
+//						topicListContainer.appendChild(topicItemEle);
+//					}
+				}
+			});
+		}
+
+		function joinTopic(topicId, topicName) {
+			showProgress('加入中...');
+			api.ajax({
+				url : GROUP_JOIN_API,
+				method : 'post',
+				timeout : 30,
+				dataType : 'json',
+				data : {
+					values : {
+						"uid" : localStorage.getItem('uid'),
+						"group_id" : topicId
+					}
+				}
+			}, function(ret, err) {
+				api.hideProgress();
+				api.sendEvent({
+					name : 'joinTopic',
+				});
+				rongJoinGroup(topicId, topicName);
+				redirectView('TopicRoom.html', {
+					'topicName' : topicName,
+					'topicId' : topicId
+				});
+			});
+		}
+
+		function enterGroup(topicId,topicName,topicTips,secretKey) {
+			redirectView('TopicRoom.html', {
+				'topicName' : topicName,
+				'topicTips' : topicTips,
+				'topicId' : topicId,
+				'secretKey' : secretKey
+			});
+		}
+
+		function showGroupDrop() {
+			$api.removeCls(document.getElementById('group-drop-list'), 'hiwall-hidden');
+			$api.removeCls(document.getElementById('group-drop-mask'), 'hiwall-hidden');
+		}
+
+		function getGroupDrop() {
+			getJsonAjax(USER_GROUP_LIST_API, {
+				'uid' : localStorage.getItem('uid')
+			}, initGroupDrop, initGroupDrop);
+		}
+
+		function initGroupDrop(groupList) {
+			api.hideProgress();
+			console.log(JSON.stringify(groupList));
+			var content = $api.byId('body-content');
+			//			content.innerHTML = '';
+			var tpl = $api.byId('group-template').text;
+			var tempFn = doT.template(tpl);
+			$api.prepend(content, tempFn(groupList));
+			echo.init({
+				offset : 0,
+				throttle : 250
+			});
+		}
+		function initTopicListTpl(topicList) {
+			api.hideProgress();
+			console.log(JSON.stringify(topicList));
+			var content = $api.byId('topic-list-container');
+			content.innerHTML = '';
+			var tpl = $api.byId('topic-template').text;
+			var tempFn = doT.template(tpl);
+			$api.prepend(content, tempFn(topicList));
+			echo.init({
+				offset : 0,
+				throttle : 250
+			});
+		}
+		function initTopTopicListTpl(topicList) {
+			api.hideProgress();
+			console.log(JSON.stringify(topicList));
+			var content = $api.byId('topic-list-container');
+			var tpl = $api.byId('top-topic-template').text;
+			var tempFn = doT.template(tpl);
+			$api.prepend(content, tempFn(topicList));
+			echo.init({
+				offset : 0,
+				throttle : 250
+			});
+		}
+		$(function() {
+			$("body").on('touchstart', '#group-drop-mask', function() {
+				closeGroupList();
+				event.stopPropagation();
+				return false;
+			});
+			$("body").on('touchend', '.group-drop-list-item', function() {
+				api.execScript({
+					name : 'index.html',
+					script : "closeGroupDrop()"
+				});
+				changeGroup();
+				event.stopPropagation();
+				return false;
+			});
+		});
+		function closeGroupList(){
+				$api.addCls(document.getElementById('group-drop-list'), 'hiwall-hidden');
+				$api.addCls(document.getElementById('group-drop-mask'), 'hiwall-hidden');
+				api.execScript({
+					name : 'index.html',
+					script : "closeGroupDrop()"
+				});
+		}
+	</script>
+</html>

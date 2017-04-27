@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no"/>
+		<title>故事</title>
+		<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+		<link rel="stylesheet" type="text/css" href="../css/dynamic.css" />
+		<link rel="stylesheet" type="text/css" href="../css/common.css" />
+		<link rel="stylesheet" type="text/css" href="../css/wight.css" />
+	</head>
+	<body>
+		<header id="hiwall-header" class="hiwall-header">
+			<div class="hiwall-header-left func-node" ref-func="goBack">
+				<img src="../image/back-icon.png">
+			</div>
+			<div id="user-name" class="hiwall-header-title">
+				心情
+			</div>
+			<div class="hiwall-header-right link-node" ref-href="dynamic_add_win.html">
+				<img src="../image/add-white.png" style="width: 25px;margin-top: 12px">
+			</div>
+		</header>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript">
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			openSubFrame('dynamic_show_frm.html', 65);
+			api.parseTapmode();
+			//      $api.fixStatusBar(header);
+		}
+		function back() {
+			api.closeWin();
+		}
+
+		function report() {
+			api.execScript({
+				frameName : 'dynamic_show_frm',
+				script : 'report()'
+			})
+		}
+	</script>
+</html>

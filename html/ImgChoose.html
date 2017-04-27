@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <title>选择地区</title>
+    <link rel="stylesheet" type="text/css" href="../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+</head>
+<body>
+	<header class="header hiwall-header">
+     <div class="hiwall-header-left func-node" ref-func="goBack"> 
+         <img src="../image/back-icon.png">
+     </div>
+        <div class="hiwall-header-title">头像</div>
+        <div class="hiwall-header-right">
+             &nbsp;
+        </div>
+	</header>
+</body>
+<script type="text/javascript" src="../script/zepto.js"></script>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/base.js"></script>
+<script type="text/javascript" src="../script/hiwall.js"></script>
+<script>
+    apiready = function () {
+    var obj = api.require('UIMediaScanner');
+obj.open({
+    type:'picture',
+    column: 4,
+    classify: true,
+    max: 4,
+    sort: {
+        key: 'time',
+        order: 'desc'
+    },
+    texts: {
+        stateText: '已选择*项',
+        cancelText: '取消',
+        finishText: '完成'
+    },
+    styles: {
+        bg: '#fff',
+        mark: {
+            icon: '',
+            position: 'bottom_left',
+            size: 20
+        },
+        nav: {
+            bg: '#eee',
+            stateColor: '#000',
+            stateSize: 18,
+            cancelBg: 'rgba(0,0,0,0)',
+            cancelColor: '#000',
+            cancelSize: 18,
+            finishBg: 'rgba(0,0,0,0)',
+            finishColor: '#000',
+            finishSize: 18
+        }
+    }
+}, function(ret){
+    if(ret){
+        alert(JSON.stringify(ret.list));
+    }
+});
+//  var obj = api.require('UIListView');
+//obj.open({
+//  rect: {
+//      x: 0,
+//      y: 0,
+//      w: 320,
+//      h: 480
+//  },
+//  data: [{
+//      uid: '1001',    //开发者自定义的唯一标识
+//      imgPath: 'http://img1.3lian.com/gif/more/11/201206/a5194ba8c27b17def4a7c5495aba5e32.jpg',
+//      title: '标题',
+//      subTitle: '子标题，说明文字',
+//      remark: '备注',
+//      icon: ''
+//  },{
+//      imgPath: 'http://img1.3lian.com/gif/more/11/201206/a5194ba8c27b17def4a7c5495aba5e32.jpg',
+//      title: '标题',
+//      subTitle: '子标题，说明文字',
+//      remark: '备注',
+//      icon: ''
+//  }],
+//  rightBtns: [{
+//      bgColor: '#388e8e',
+//      activeBgColor: '',
+//      width: 70,
+//      title: '按钮',
+//      titleSize: 12,
+//      titleColor: '#fff',
+//      icon: '',
+//      iconWidth: 20
+//  }],
+//  styles: {
+//      borderColor: '#696969',
+//      item: {
+//          bgColor: '#AFEEEE',
+//          activeBgColor: '#F5F5F5',
+//          height: 55.0,
+//          imgWidth: 40,
+//          imgHeight: 40,
+//          placeholderImg: '',
+//          titleSize: 12.0,
+//          titleColor: '#000',
+//          subTitleSize: 12.0,
+//          subTitleColor: '#000', 
+//          remarkColor: '#000',
+//          remarkSize: 16,
+//          remarkIconWidth: 30
+//      }
+//  },
+//  fixedOn: ''
+//}, function(ret){
+//  alert(JSON.stringify(ret));
+//});
+//  var obj = api.require('sideMenu');
+//var arrayPath = new Array();
+//arrayPath[0]={icon:'widget://res/sideMemu_icon.png',bgImg:'widget://res/sideMenu_bg.png' };
+//arrayPath[1]={icon: 'widget://res/sideMemu_icon.png',bgImg: 'widget://res/sideMenu_bg1.png' };
+//arrayPath[2]={icon: 'widget://res/sideMemu_icon.png',bgImg: 'widget://res/sideMenu_bg.png' };
+//arrayPath[3]={icon: 'widget://res/sideMemu_icon.png',bgImg: 'widget://res/sideMenu_bg1.png' };
+//
+//obj.open({
+//  btnArray:arrayPath
+//},function(ret,err){
+//  api.alert({msg:'点击了菜单id为'+ret.id+'的第'+ret.index+'个按钮'});
+//});
+//obj.show({
+//  id:1
+//});
+//var tabBarMenu = api.require("tabBarMenu");
+//var theme = "simple"; //可以支持自定义主题,示例内置两种风格题:simple,night.
+//tabBarMenu.open({ //打开标签菜单.
+//  defaultBarSelect: 1,//默认选中的标签栏按钮
+//  autoLayout: true,//是否自动调整当前页面网页视图的位置.
+//  barConfig: {//标签栏通用配置信息.
+//              //背景图片路径.
+//      bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_bg.png"
+//  },
+//  barItemConfig: {//标签栏按钮的通用配置信息.
+//      //文本颜色, 格式为#fff、#ffffff、rgba(r,g,b,a)等
+//      titleColor: "#ffffff",
+//      titleSelectColor: "#cccccc",                //选中状态时,按钮文本的颜色, 默认与titleColor相同.
+//      fontSize: 11.0,                             //文字大小.
+//      textMarginTop: 41.0,                           //文本距离按钮上边界的距离.
+////      primaryItem: 2                              //激活弹出菜单的标签栏按钮的下标.
+//  },    
+//  //标签栏各按钮的信息.
+//  barItems: [{title: "动态",//标题.
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_auth.png",                          //背景图片路径.
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_auth_click.png"                  //被点击时的背景图片路径.
+//      },
+//      {title: "与我有关",//标题
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_at.png",//背景图片路径.
+//          //被点击时的背景图片路径.
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_at_click.png"
+//      },
+//      {title: "动态", //标题.
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn.png",        
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_click.png"     
+//      },
+//      {title: "玩吧", 
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_more.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_more_click.png" 
+//      },
+//      {title: "空间",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_space.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_icon_space_click.png" 
+//      }
+//  ],
+//  //菜单栏通用配置. 
+//  menuConfig: {                    
+//      coverBgColor: "#000000", //遮罩的背景色, 格式为#fff、#ffffff、rgba(r,g,b,a)等.  
+//      coverAlpha: 0.8,//遮罩的透明度, 取值范围0.0~1.0.  
+//     rows: 4//单页菜单每行显示的按钮数.
+//  },
+//  //菜单栏各按钮通用配置信息.
+//  menuItemConfig: {                    
+//      titleColor: "#ffffff",//文本颜色, 格式为#fff、#ffffff、rgba(r,g,b,a)等.
+//      titleSelectColor:"#000000",//选中状态时,按钮文本的颜色, 默认与titleColor相同.
+//      fontSize: 11.0,//字体大小.
+//      textMarginTop: 90.0//文本距离按钮上边界的距离.
+//  },
+//  //菜单栏各按钮的信息.
+//  menuItems: [
+//        {title: "说说",//标题.
+//              bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_talk.png",//背景图片.  
+//              //被点击时的背景图片.
+//              bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_talk_click.png" 
+//      },
+//      {title: "照片",                       
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_transferphotos.png",  
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_transferphotos_click.png"  
+//      },
+//      {title: "水印相机",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_watermarkcamera.png",
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_watermarkcamera_click.png"
+//      },
+//      { title: "视频",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_video.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_video_click.png" 
+//      },
+//      {title: "签到",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_registration.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_registration_click.png"  
+//
+//      },
+//      { title: "连拍",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_continuousshooting.png", 
+//      bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_continuousshooting_click.png" 
+//      },
+//      {itle: "日志",                      
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_journal.png",
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_journal_click.png"          
+//      },
+//      {title: "二维码",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_2dbarcode.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_2dbarcode_click.png"
+//      },
+//      {title: "语音相机",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_videocamera.png",
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_videocamera_click.png"  
+//      },
+//      {title: "位置",
+//          bgImg: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_place.png", 
+//          bgImgClick: "widget://image/tabBarMenu/" + theme + "/tabbar_btn_popup_place_click.png"  
+//      }
+//  ]
+//}, function(ret, err){                             //点击标签栏或菜单栏按钮时的回调方法.点击激活菜单栏的标签栏按钮时不会触发此方法.
+//  if(ret){
+//      var item = ret.item;
+//      if("menu" == item.type){
+//          tabBarMenu.hideMenu();
+//      }
+//      api.alert({title: "提示", msg: "您点击了 " + item.type + " 上,第 " + item.index + " 个按钮!", buttons: ["确定"]});
+//  }
+//});
+//var obj = api.require('UIChatBox');
+//obj.open({
+//  placeholder: '',
+//  maxRows: 4,
+//  emotionPath: 'widget://image/emotion',
+//  texts: {
+//      recordBtn: {
+//          normalTitle: '按住 说话',
+//          activeTitle: '松开 结束'
+//      }
+//  },
+//  styles: {
+//      inputBar: {
+//          borderColor: '#d9d9d9',
+//          bgColor: '#f2f2f2'
+//      },
+//      inputBox: {
+//          borderColor: '#B3B3B3',
+//          bgColor: '#FFFFFF'
+//      },
+//      emotionBtn: {
+//          normalImg: 'widget://image/chatBox_face1.png'
+//      },
+//      extrasBtn: {
+//          normalImg: 'widget://image/chatBox_add1.png'
+//      },
+//      keyboardBtn: {
+//          normalImg: 'widget://image/chatBox_key1.png'
+//      },
+//      speechBtn: {
+//          normalImg: 'widget://image/chatBox_key1.png'
+//      },
+//      recordBtn: {
+//          normalBg: '#c4c4c4',
+//          activeBg: '#999999',
+//          color: '#000',
+//          size: 14
+//      },
+//      indicator: {
+//          target: 'both',
+//          color: '#c4c4c4',
+//          activeColor: '#9e9e9e'
+//      }
+//  },
+//  extras: {
+//      titleSize: 10,
+//      titleColor: '#a3a3a3',
+//      btns: [{
+//          title: '图片',
+//          normalImg: 'widget://image/chatBox_album1.png',
+//          activeImg: 'widget://image/chatBox_album2.png'
+//      },{
+//          title: '拍照',
+//          normalImg: 'widget://image/chatBox_cam1.png',
+//          activeImg: 'widget://image/chatBox_cam2.png'
+//      }]
+//  }
+//}, function(ret){
+//  //点击附加功能面板
+//  if(ret.eventType == 'clickExtras'){
+//      alert("用户点击了第"+ ret.index +"个按钮");
+//  }
+//  //点击发送按钮
+//  if(ret.eventType == 'send'){
+//      alert('输入的内容是：'+ ret.msg);
+//  }
+//});
+    }
+</script> 
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title>搜索</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+	</head>
+	<body class="hiwall-bg-gray">
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/rongyun.js"></script>
+	<script>
+		var UIlistObj = null;
+		var friendsArr = new Array();
+		apiready = function() {if(typeof onPageInit=="function"){onPageInit();}if(typeof initPage=="function"){initPage()}
+			openSearch();
+			initResultList();
+		}
+		function openSearch() {
+			var obj = api.require('UISearchBar');
+			obj.open({
+				placeholder : '用户搜索',
+				historyCount : 10,
+				showRecordBtn : false,
+				texts : {
+					cancelText : '取消',
+					clearText : '清除搜索记录'
+				},
+				styles : {
+					navBar : {
+						bgColor : '#c9c9c9',
+						borderColor : '#ccc'
+					},
+					searchBox : {
+						bgImg : 'widget://image/bg-white.png',
+						color : '#000',
+						height : 34
+					},
+					cancel : {
+						bg : 'rgba(0,0,0,0)',
+						color : '#3598DC',
+						size : 16
+					},
+					list : {
+						color : '#696969',
+						bgColor : '#FFFFFF',
+						borderColor : '#eee',
+						size : 16
+					},
+					clear : {
+						color : '#000000',
+						borderColor : '#ccc',
+						size : 16
+					}
+				}
+			}, function(ret) {
+				console.log('点击了搜索按钮');
+				var func = 'searchFriends("' + ret.text + '")';
+				api.execScript({
+					frameName : 'UserSearchSub.html',
+					script : func
+				});
+				if (ret.eventType == 'search') {
+					//					api.sendEvent({
+					//						name : 'search',
+					//						extra : {
+					//							data : ret.result.message
+					//						}
+					//					})
+				} else if (ret.eventType == 'history') {
+				} else {
+					console.log(ret.text);
+				}
+			});
+		}
+		function initResultList() {
+			UIlistObj = api.require('UIListView');
+			UIlistObj.open({
+				rect : {
+					x : 0,
+					y : 0,
+					h : api.frameHeight,
+					w : api.frameWidth
+				},
+				data : friendsArr,
+				rightBtns : [{
+					bgColor : '#ef6060',
+					activeBgColor : '',
+					width : 70,
+					title : '删除',
+					titleSize : 15,
+					titleColor : '#fff',
+					icon : '',
+					iconWidth : 20
+				}],
+				styles : {
+					borderColor : '#CCCCCC',
+					item : {
+						bgColor : '#efefef',
+						activeBgColor : '#F5F5F5',
+						height : 70.0,
+						imgWidth : 55,
+						imgHeight : 55,
+						placeholderImg : '',
+						titleSize : 18.0,
+						titleColor : '#000',
+						subTitleSize : 13.0,
+						subTitleColor : '#a0a0a0',
+						remarkColor : '#a0a0a0',
+						remarkSize : 16,
+						remarkIconWidth : 30
+					}
+				},
+				fixedOn : api.frameName
+			}, function(ret) {
+				//朋友列表加载完成
+				var clickCB = function(ret, eventType) {
+					if (eventType == "clickRemark") {
+						showProgress('请求中...');
+						addFriends(ret.data.uid,function(ret){
+			  				api.hideProgress();
+							api.toast({
+	                            msg:ret
+                            });
+						});
+					} else if (eventType == "clickContent") {
+						console.log(JSON.stringify(ret.data));
+						redirectView('ChatRoom.html', {
+							'friendsId' : ret.data.uid
+						});
+					} else if (eventType == "clickImg") {
+						redirectView('FriendsInfo.html', ret.data);
+					} 
+//					else if (eventType == "clickRightBtn") {
+//						delFriends(ret.data.uid, delItem);
+//					}
+				}
+				onListviewClick(UIlistObj, ret, clickCB);
+			});
+		}
+
+		function searchFriends(keyword) {
+			postJsonAjax(FRIENDS_SEARCH_API, {
+				'nickname' : keyword
+			}, showResult);
+		}
+
+		function showResult(friendsList) {
+			friendsArr = new Array();
+			console.log('结果：' + JSON.stringify(friendsList));
+			for (var i = 0; i < friendsList.length; i++) {
+				var friends = {icon:"widget://image/add1.png"};
+				friends['rightBtns'] = [{
+					bgColor : '#ef6060',
+					activeBgColor : '',
+					width : 70,
+					title : '删除',
+					titleSize : 15,
+					titleColor : '#fff',
+					icon : '',
+					iconWidth : 20
+				}];
+				friends['uid'] = friendsList[i].uid;
+				friends['imgPath'] = HOST + "/" + friendsList[i].avatar;
+				friends['title'] = friendsList[i].nickname;
+				friends['subTitle'] = friendsList[i].signature;
+				friendsArr.push(friends);
+			}
+			initFriendsList(friendsArr);
+		}
+
+		function initFriendsList(friendsArr) {
+			UIlistObj.reloadData({
+				data : friendsArr
+			}, function(ret) {
+				if (ret.status) {
+					console.log('刷新列表成功');
+				}
+			});
+		}
+
+	</script>
+</html>

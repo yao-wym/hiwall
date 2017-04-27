@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/common.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/wight.css"/>
+		<style>
+			body {
+			}
+			.hiwall-edit-input {
+				background-color: white;
+				height: 40px;
+				color: #EEEEEE;
+				margin-top: 20px;
+				width: 100%;
+			}
+			.setting-icon {
+				width: 20px;
+				position: relative;
+				top: 5px
+			}
+			.next-img {
+				width: 10px;
+				margin-right: 5px;
+				position: relative;
+				top: 3px;
+			}
+			.hiwall-label-white {
+				height: 40px;
+				line-height: 40px;
+			}
+			.label-title {
+				margin-left: 5px;
+			}
+			#friends-unadd, #friends-added {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body class="hiwall-bg-gray">
+		<div style="color: #ffffff;text-align: center;height: 220px;padding-top: 20px ;background-image: url(../image/user-bg.png);background-size: 100%">
+			<img id="usericon" class="user-icon" src="../image/user-icon.png" >
+			<p id="nickname" class="hiwall-con-white"style="margin-top: 10px"></p>
+			<!--<p class="hiwall-con-white" style="margin-top: 15px">wenyao.mnin</p>-->
+		</div>
+		<section style="margin-top: 30px">
+			<div class="hiwall-label-white">
+				<span>性别</span>
+				<span id="sex" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<!--<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+			<span>生日</span>
+			<span id="birthday" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>-->
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>地区</span>
+				<span id="place" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>个性签名</span>
+				<span id="signature" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+			<div class="hiwall-dividing-gray"></div>
+			<div class="hiwall-label-white">
+				<span>邮箱</span>
+				<span id="email" class="hiwall-con-deepgray hiwall-label-right"></span>
+			</div>
+		</section>
+		<div style="margin-top:20px">
+			<div id="friends-unadd" style="display:none">
+				<button style="width:70%;" class="hiwall-button-blue func-node" ref-func="addFriendsFunc">
+					加好友
+				</button>
+			</div>
+			<div id="friends-added" style="display:none">
+				<button style="width:70%;" class="hiwall-button-blue func-node" ref-func="chatFriendsFunc">
+					发消息
+				</button>
+				<button style="width:70%;margin-top:10px;background-color:red" class="hiwall-button-blue func-node" ref-func="delFriendsFunc">
+					删除好友
+				</button>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript" src="../script/zepto.js"></script>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/base.js"></script>
+	<script type="text/javascript" src="../script/hiwall.js"></script>
+	<script type="text/javascript">
+		var nicknameEle = document.getElementById('nickname');
+		var usericonEle = document.getElementById('usericon');
+		var emailEle = document.getElementById('email');
+		var signatureEle = document.getElementById('signature');
+		var friendsInfo = {};
+		//	var placeEle = document.getElementById('place');
+		//	var birthdayEle = document.getElementById('birthday');
+		var sexEle = document.getElementById('sex');
+		function initFcenter(friends) {
+			friendsInfo = friends;
+			nicknameEle.innerText = friends.nickname;
+			sexEle.innerText = sexText[friends.sex] === undefined ? '保密' : sexText[friends.sex];
+			//		nicknameEle.innerText = friends.nickname;
+			signatureEle.innerText = friends.signature;
+			emailEle.innerText = friends.email;
+			usericonEle.setAttribute('src', HOST + '/' + friends.avatar128);
+		}
+
+		apiready = function() {
+			if ( typeof onPageInit == "function") {
+				onPageInit();
+			}
+			if ( typeof initPage == "function") {
+				initPage()
+			}
+			//		nicknameEle.innerText = api.pageParam.friends.title;
+			//		usericonEle.setAttribute('src',api.pageParam.friends.imgPath);
+			showProgress();
+			initFInfo();
+			checkFriendsState(api.pageParam.uid, function() {
+				$api.byId('friends-unadd').setAttribute('style', 'display:none');
+				$api.byId('friends-added').setAttribute('style', 'display:block');
+			}, function() {
+				$api.byId('friends-unadd').setAttribute('style', 'display:block');
+				$api.byId('friends-added').setAttribute('style', 'display:none');
+			});
+		};
+		function addFriendsFunc() {
+			showProgress('请求中...');
+			addFriends(api.pageParam.uid, function() {
+				api.hideProgress();
+				api.toast({
+					msg : '好友请求已发送'
+				});
+				//				$api.byId('friends-unadd').setAttribute('style','display:none');
+				//				$api.byId('friends-added').setAttribute('style','display:block');
+			})
+		}
+
+		function delFriendsFunc() {
+			showProgress('请求中...');
+			postJsonAjax(FRIENDS_DELETE_API, {
+				"uid" : localStorage.getItem('uid'),
+				"target_uid" : api.pageParam.uid
+			}, function() {
+				api.hideProgress();
+				$api.byId('friends-unadd').setAttribute('style', 'display:block');
+				$api.byId('friends-added').setAttribute('style', 'display:none');
+			});
+		}
+
+		function chatFriendsFunc() {
+			console.log(JSON.stringify(friendsInfo));
+			friendsInfo['title'] = friendsInfo['nickname'];
+			if (!isEmpty(friendsInfo)) {
+				redirectView('ChatRoom.html', {
+					'friendsId' : friendsInfo.uid
+				})
+			}
+		}
+
+		function initFInfo() {
+			loadFriendsInfo(api.pageParam.uid, initFcenter);
+		}
+	</script>
+</html>
